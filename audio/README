@@ -1,1 +1,4 @@
 audio extraction and training
+
+old_feats: features extracted by splitting channels
+assuming A is left channel and B is right channel
