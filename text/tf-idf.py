@@ -21,6 +21,7 @@ speakersPerTerm = Counter()
 globalTFIDF = Counter()
 TFIDF = Counter()
 stripCommentsRegex = re.compile('\{.+?\}')
+stripSoundsRegex = re.compile('\[.+?\]')
 
 def outputTFIDF():
     outputfile = open('output', 'w')
@@ -55,10 +56,13 @@ def computeTFIDF():
 
 def processSpeakerText(speaker, text, wordsForSpeaker):
     #We strip out any double parens, for tf-idf we don't care about we assume the transcriber's guess was correct
-    text = text.strip("((").strip("))")
+    text = text.replace("((","").replace("))","")
     #Strip out any curly-braces, as we don't want to count transcriber comments 
     text = stripCommentsRegex.sub('', text)
-    text = text.strip(".").strip(",")
+    text = stripSoundsRegex.sub('', text)
+    text = text.replace(",", "").replace(".","").replace("?","").replace("#","")
+    
+    text = text.lower()
     words = text.split()
     
     for word in words:            
