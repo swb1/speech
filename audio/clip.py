@@ -5,8 +5,7 @@
 import sys,os
 import ntpath
 
-#mrkfile='sw3035.mrk'
-#audfile='sw03035.sph'
+soxdir='sox-14.4.1/src/sox'
 
 # return A's and B's clips
 def getclips(mrkfile):
@@ -96,27 +95,31 @@ def getclips(mrkfile):
 
 # generate sox commands to trim clips
 def genouts(audfile, clips):
+  global soxdir
+
   buf = ''
   for i, (start, dur) in enumerate(clips):
     name = ntpath.basename(audfile).split('.')[0]
     out = name + '-' + str(i) + '.wav'
     buf += out + ' '
-    print 'sox-14.4.1/src/sox ' + audfile + ' ' + out + ' trim ' + str(start) + ' ' + str(dur)
+    print soxdir + ' ' + audfile + ' ' + out + ' trim ' + str(start) + ' ' + str(dur)
 
   return buf
 
 def getwav(mrkfile, audfile):
+  global soxdir
+
   (a_clips, b_clips) = getclips(mrkfile)
   name = ntpath.basename(audfile).split('.')[0]
   a_buf = genouts(audfile, a_clips)
-  print 'sox-14.4.1/src/sox ' + a_buf + name + '-A1.wav'
-  print 'sox-14.4.1/src/sox ' + name + '-A1.wav -s -b 16 ' + name + '-A.wav '
+  print soxdir + ' ' + a_buf + name + '-A1.wav'
+  print soxdir + ' ' + name + '-A1.wav -s -b 16 ' + name + '-A.wav '
   print 'mv ' + name + '-A.wav wavdir'
   print 'rm *.wav\n'
 
   b_buf = genouts(audfile, b_clips)
-  print 'sox-14.4.1/src/sox ' + b_buf + name + '-B1.wav'
-  print 'sox-14.4.1/src/sox ' + name + '-B1.wav -s -b 16 ' + name + '-B.wav '
+  print soxdir + ' ' + b_buf + name + '-B1.wav'
+  print soxdir + ' ' + name + '-B1.wav -s -b 16 ' + name + '-B.wav '
   print 'mv ' + name + '-B.wav wavdir'
   print 'rm *.wav\n'
 
