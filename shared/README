@@ -1,7 +1,10 @@
 shared files between audio and speech
 
-conv2per.txt: for each phone call, record the call id, caller (A) id, and callee (B) id
-person.txt: a person's background information
+conv2per.txt: 
+for each phone call, record the call id, caller (A) id, and callee (B) id
+
+person.txt: 
+a person's background information
   age (call year from conv.tab - birth year from caller.tab; for simplicity, call year = 1992):
     0 - less than 20
     1 - 20-29
@@ -32,3 +35,9 @@ person.txt: a person's background information
     2 - college
     3 - more than college
     4 (9 in caller.tab) - unknown
+
+missing.txt:
+a list of .sph files which don't have the corresponding transcription files
+
+sph2mrk.txt:
+each row shows the path for audio and transcription files for each conversation
