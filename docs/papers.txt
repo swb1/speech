@@ -1,0 +1,8 @@
+Shi:
+Modeling Latent Biographic Attributes in Conversational Genres
+http://aclweb.org/anthology/P/P09/P09-1080.pdf
+
+Unsupervised feature learning for audio classification using convolutional deep belief networks
+http://web.eecs.umich.edu/~honglak/nips09-AudioConvolutionalDBN.pdf
+
+Peter:
