@@ -129,6 +129,9 @@ def getwav(mrkfile, audfile):
   print 'rm wavdir/' + name + '-A.wav'
   print 'rm wavdir/' + name + '-B.wav'
 
+if not os.path.exists('wavdir'):
+  os.makedirs('wavdir')
+
 f = open('sph2mrk.txt', 'r')
 for i,line in enumerate(f):
   print '\necho ' + str(i)
