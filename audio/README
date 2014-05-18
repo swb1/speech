@@ -1,4 +1,8 @@
 audio extraction and training
 
-old_feats: features extracted by splitting channels
+old_feats (not used): features extracted by splitting channels
 assuming A is left channel and B is right channel
+
+feats (used): features extracted by separating A and B in audio file using .mrk files
+
+label_feats (used): label of features for each property
