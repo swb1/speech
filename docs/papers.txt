@@ -5,4 +5,17 @@ http://aclweb.org/anthology/P/P09/P09-1080.pdf
 Unsupervised feature learning for audio classification using convolutional deep belief networks
 http://web.eecs.umich.edu/~honglak/nips09-AudioConvolutionalDBN.pdf
 
+Below are the papers Dan suggested:
+A Tutorial on Text-Independent Speaker Veriﬁcation
+http://dl.acm.org/citation.cfm?id=1289376
+
+Support Vector Machines using GMM Supervectors for Speaker Verication
+http://www.ll.mit.edu/mission/cybersec/publications/publication-files/full_papers/0508_WCampbell.pdf
+
+NIST Speaker Recognition Evaluation Chronicles - Part 2
+http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=4013537
+
+Speaker Recognition based on Idiolectal Differences between Speakers
+http://perso.telecom-paristech.fr/~chollet/Biblio/Congres/Audio/Eurospeech01/CDROM/papers/page2521.pdf
+
 Peter:
