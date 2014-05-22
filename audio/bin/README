@@ -1,0 +1,16 @@
+list of executable files
+
+compute-mfcc-feats:
+  compute mfcc features
+
+copy-feats:
+  copy mfcc features
+
+sox:
+  manipulate audio files
+
+train:
+  train SVM data
+
+predict:
+  predict SVM data
