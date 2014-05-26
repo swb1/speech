@@ -18,41 +18,61 @@ from sklearn import svm
 TRANSCRIPTDIRECTORYROOT = "/afs/ir/data/linguistic-data/Switchboard/Switchboard-Transcripts/swb1/trans/"
 SUPPORTFILESDIR = "../shared/"
 
-globalTFIDF = Counter()
+globalTFIDFunigram = Counter()
+globalTFIDFbigram = Counter()
+stopwords = Counter()
 
 stripCommentsRegex = re.compile('\{.+?\}')
 stripSoundsRegex = re.compile('\[.+?\]')
 
-def outputTFIDF(TFIDF):
-    outputfile = open('output', 'w')
-    outputfile2 = open('outputtop10', 'w')
-    outputfile3 = open('outputtotal100', 'w')
-    for speaker in TFIDF:
-        outputfile.write(speaker + "---\n")
+#top 1k unigrams
+#top 1k bigrams
+#all stopwords
+#all bigrams consisting of 2 stopwords
+def outputTFIDF(TFIDFunigram, TFIDFbigram):
+    outputfile2 = open('outputtop10unigram', 'w')
+    outputfile3 = open('outputtop10bigram', 'w')
+    outputfile4 = open('outputtotal100unigram', 'w')
+    outputfile5 = open('outputtotal100bigram', 'w')
+    for speaker in TFIDFunigram:
         outputfile2.write(speaker + "---\n")
-        for term in TFIDF[speaker]:
-            score = TFIDF[speaker][term]
-            outputfile.write(term + "," + str(score) + "\n")
-        for entry in TFIDF[speaker].most_common(10):
+        for entry in TFIDFunigram[speaker].most_common(10):
             outputfile2.write(entry[0] + "," + str(entry[1]) + "\n")
-    for entry in globalTFIDF.most_common(100):
-        outputfile3.write(entry[0] + "," + str(entry[1]) + "\n")
-    outputfile.close()
+    
+    for speaker in TFIDFbigram:
+        outputfile3.write(speaker + "---\n")
+        for entry in TFIDFbigram[speaker].most_common(10):
+            outputfile3.write(entry[0] + "," + str(entry[1]) + "\n")
+            
+    for entry in globalTFIDFunigram.most_common(100):
+        outputfile4.write(entry[0] + "," + str(entry[1]) + "\n")
+    for entry in globalTFIDFbigram.most_common(100):
+        outputfile5.write(entry[0] + "," + str(entry[1]) + "\n")
     outputfile2.close()
     outputfile3.close()
+    outputfile4.close()
+    outputfile5.close()
 
-def computeTFIDF(TFIDF, speakersPerTerm, termScorePerSpeakerDict):
+def computeTFIDF(TFIDFunigram, TFIDFbigram, speakersPerTerm, termScorePerSpeakerDict):
     numSpeakers = len(termScorePerSpeakerDict)
+    print "num speakers: " + str(numSpeakers)
     for speaker in termScorePerSpeakerDict:
-        if speaker not in globalTFIDF:
-            TFIDF[speaker] = Counter()
-            
+        if speaker not in TFIDFunigram:
+            TFIDFunigram[speaker] = Counter()
+        if speaker not in TFIDFbigram:
+            TFIDFbigram[speaker] = Counter()  
+        
         for word in termScorePerSpeakerDict[speaker]:
             termscore = termScorePerSpeakerDict[speaker][word]
             inversedocfrequency = math.log(float(numSpeakers) / speakersPerTerm[word])
-
-            TFIDF[speaker][word] = termscore * inversedocfrequency
-            globalTFIDF[word] += termscore * inversedocfrequency
+            
+            if len(word.strip().split()) > 1:
+                TFIDFbigram[speaker][word] = termscore * inversedocfrequency
+                globalTFIDFbigram[word] = max(termscore * inversedocfrequency, globalTFIDFunigram[word])  #/ numSpeakers
+            else:
+                TFIDFunigram[speaker][word] = termscore * inversedocfrequency
+                globalTFIDFunigram[word] = max(termscore * inversedocfrequency, globalTFIDFunigram[word])  #/ numSpeakers
+       
 
 def processSpeakerText(speaker, text, wordsForSpeaker):
     #We strip out any double parens, for tf-idf we don't care about we assume the transcriber's guess was correct
@@ -65,13 +85,16 @@ def processSpeakerText(speaker, text, wordsForSpeaker):
     text = text.lower()
     words = text.split()
     
-    for word in words:            
+    prevword = "[start]"
+    for word in words:    
         wordsForSpeaker[speaker][word] += 1
-        
-
+        wordsForSpeaker[speaker][prevword + " " + word] += 1
+        prevword = word
+    if len(words) > 0:
+        wordsForSpeaker[speaker][words[-1] + " [end]"] += 1
     #num times this term occurs in this doc * (number of documents / number of documents containing the term)
-    
-def readSpeechFile(filepath, speakersPerTerm, termScorePerSpeakerDict):
+
+def readSpeechFile(filepath, speakersPerTerm, termScorePerSpeakerDict, convtospeakers):
     curfile = open(filepath, 'r')
     fulltext = curfile.read()
     #skipping the file header and getting the speech segments divided up
@@ -79,7 +102,12 @@ def readSpeechFile(filepath, speakersPerTerm, termScorePerSpeakerDict):
     speechtext = re.split("={10,}",fulltext)[1]
     speakertexts = speechtext.split("\n\n")[1:]
     wordsForSpeaker = {}
-    print filepath
+    
+    convID = filepath.split("/")[-1][2:-4]
+    if convID not in convtospeakers:
+        return
+        
+    #print filepath
     previousspeaker = ""
     previouspreviousspeaker = ""    
     for speakertext in speakertexts:
@@ -97,20 +125,25 @@ def readSpeechFile(filepath, speakersPerTerm, termScorePerSpeakerDict):
             if text != '':
                 processSpeakerText(speaker, text, wordsForSpeaker)
     
+    speakerIDs = convtospeakers[convID]
     for speaker in wordsForSpeaker:
+        if speaker == "A":
+            speakerID = speakerIDs[0]
+        else:
+            speakerID = speakerIDs[1]
         topfrequency = wordsForSpeaker[speaker].most_common(1)[0][1]
         for term in wordsForSpeaker[speaker]:
             count = wordsForSpeaker[speaker][term]
             augmentedFrequency = 0.5 + (0.5 * float(count) / topfrequency)
             
-            if filepath+speaker not in termScorePerSpeakerDict:
-                termScorePerSpeakerDict[filepath+speaker] = {}
-                termScorePerSpeakerDict[filepath+speaker][term] = augmentedFrequency
+            if speakerID not in termScorePerSpeakerDict:
+                termScorePerSpeakerDict[speakerID] = {}
+                termScorePerSpeakerDict[speakerID][term] = augmentedFrequency
             else:
-                if term not in termScorePerSpeakerDict[filepath+speaker]:
-                    termScorePerSpeakerDict[filepath+speaker][term] = augmentedFrequency
+                if term not in termScorePerSpeakerDict[speakerID]:
+                    termScorePerSpeakerDict[speakerID][term] = augmentedFrequency
                 else:
-                    termScorePerSpeakerDict[filepath+speaker][term] += augmentedFrequency
+                    termScorePerSpeakerDict[speakerID][term] += augmentedFrequency
                        
             speakersPerTerm[term] += 1
             
@@ -151,7 +184,7 @@ def getConvToSpeakers():
         convToSpeaker[conv] = [speakerA, speakerB]
     return convToSpeaker
     
-def getLabels(speakerlist, convtospeakers):
+def getLabels(speakerlist, convtospeakers, labelToUse):
     curfile = open(SUPPORTFILESDIR + "person.txt", 'r')
     speakerToLabels = {}
     speakervector = []
@@ -164,90 +197,152 @@ def getLabels(speakerlist, convtospeakers):
         labelD = elements[4]
         speakerToLabels[speaker] = [labelA, labelB, labelC, labelD]   
     for speaker in speakerlist:
-        speakerLetter = speaker[-1]
-        convId = speaker.split("/")[-1][2:-5]
-        print convId
-        #FIX MISSING ENTRY IN CONVMAPPINGFILE later
-        if convId in convtospeakers:
-            if speakerLetter == "A":
-                speakerId = convtospeakers[convId][0]
-                speakervector.append(speakerToLabels[speakerId][1])
-            elif speakerLetter == "B":
-                speakerId = convtospeakers[convId][1]
-                speakervector.append(speakerToLabels[speakerId][1])
-            else:
-                print speaker
-                print speakerLetter
-                asdasdads
-        else:
-            speakervector.append("0")
+        speakervector.append(speakerToLabels[speaker][labelToUse])
+        
     return speakervector
 
-def getVectors(speakersPerTermTrain, TFIDF, speakerlist):
-    terms = sorted(speakersPerTermTrain.keys())
+    
+def getVocabulary(allterms):
+    validvocab = []
+    topunigrams = globalTFIDFunigram.most_common(1000)
+    topbigrams = globalTFIDFbigram.most_common(1000)
+    for term in allterms:
+        if len(term.strip().split()) > 1:
+            if term.strip().split()[0] in stopwords and term.strip().split()[1] in stopwords:
+                validvocab.append(term)
+                continue
+            else:
+                for entry in topbigrams:
+                    if term == entry[0]:
+                        validvocab.append(term)
+                        break
+        else:
+            if term in stopwords:
+                validvocab.append(term)
+                continue
+            else:
+                for entry in topunigrams:
+                    if term == entry[0]:
+                        validvocab.append(term)
+                        break
+         
+    return validvocab
+
+
+def getVectors(speakersPerTermTrain, TFIDFunigram, TFIDFbigram, speakerlist):
     vector = []
+
+    terms = getVocabulary(sorted(speakersPerTermTrain.keys()))
+    #print len(speakerlist)
+    #print len(terms)
     for speaker in speakerlist:
         termvector = []
+        #[TFIDF[speaker][term] for term in terms]
         for term in terms:
-            if term in TFIDF[speaker]:
-                termvector.append(TFIDF[speaker][term])
+            if len(term.strip().split()) > 1:
+                if term in TFIDFbigram[speaker]:
+                    termvector.append(TFIDFbigram[speaker][term])
+                else:
+                    termvector.append("0")
             else:
-                termvector.append("0")
+                if term in TFIDFunigram[speaker]:
+                    termvector.append(TFIDFunigram[speaker][term])
+                else:
+                    termvector.append("0")
         vector.append(termvector)
+
     return vector
+    
+def outputCalculation(prefix, vectors, labels):
+    curfile = open(prefix + ".lsvm", 'w')
+    for i in range(0,len(labels)):
+        outputstr = ""
+        outputstr += labels[i] + " "
+        for j in range(0,len(vectors[i])):
+            outputstr += str(j+1) + ":" + str(vectors[i][j]) + " "
+        outputstr = outputstr.strip() + "\n"
+        #print outputstr
+        curfile.write(outputstr)
         
+def loadStopList():
+    curfile = open("stopwords", 'r')
+    for word in curfile:
+        stopwords[word] += 1
+    
 def main():
+    loadStopList()
+    labelToUse = int(sys.argv[1])
+    labelname = ""
+    if labelToUse == 0:
+        labelname = "age"
+    elif labelToUse == 1:
+        labelname = "gender"
+    elif labelToUse == 2:
+        labelname = "accent"
+    elif labelToUse == 3:
+        labelname = "edu"
+    
+    #isBuildStep = sys.argv[1]
     speakersPerTermTrain = Counter()
     speakersPerTermTest = Counter()
     termScorePerSpeakerDictTrain = {}
     termScorePerSpeakerDictTest = {}
-    TFIDFtrain = {}
-    
+    TFIDFtrainunigram = {}
+    TFIDFtrainbigram = {}
     totalfiles = []
+
     totalfiles.extend(readPhase(TRANSCRIPTDIRECTORYROOT + "phase1/"))
     totalfiles.extend(readPhase(TRANSCRIPTDIRECTORYROOT + "phase2/"))
     trainfiles = totalfiles[:int(len(totalfiles)*0.8)]
     testfiles = totalfiles[int(len(totalfiles)*0.8):]
+    
+    convtospeakers = getConvToSpeakers()
+    
     print "before read in"
     for file in trainfiles:
-        readSpeechFile(file, speakersPerTermTrain, termScorePerSpeakerDictTrain)
+        readSpeechFile(file, speakersPerTermTrain, termScorePerSpeakerDictTrain, convtospeakers)
     print "after read in"
-    computeTFIDF(TFIDFtrain, speakersPerTermTrain, termScorePerSpeakerDictTrain)
+    computeTFIDF(TFIDFtrainunigram, TFIDFtrainbigram, speakersPerTermTrain, termScorePerSpeakerDictTrain)
     print "after compute tfidf"
-    outputTFIDF(TFIDFtrain)
+    outputTFIDF(TFIDFtrainunigram, TFIDFtrainbigram)
     print "after output"
-    speakers = TFIDFtrain.keys()
-    convtospeakers = getConvToSpeakers()
+    speakers = TFIDFtrainunigram.keys()
+    
     print "after get convtospeaker"
-    vectors = getVectors(speakersPerTermTrain, TFIDFtrain, speakers)
+    vectors = getVectors(speakersPerTermTrain, TFIDFtrainunigram, TFIDFtrainbigram, speakers)
+    #print vectors
     print "after get vectors"
-    labels = getLabels(speakers, convtospeakers)
+    labels = getLabels(speakers, convtospeakers, labelToUse)
     print "after get labels"
-    clf = svm.SVC()
-    clf.fit(vectors, labels)
+    
+    outputCalculation("train_" + labelname, vectors, labels)
+    #clf = svm.SVC()
+    #clf.fit(vectors, labels)
     print "after svm fit"
-    TFIDFtest = {}
+    TFIDFtestunigram = {}
+    TFIDFtestbigram = {}
     for file in testfiles:
-        readSpeechFile(file, speakersPerTermTest, termScorePerSpeakerDictTest)
+        readSpeechFile(file, speakersPerTermTest, termScorePerSpeakerDictTest, convtospeakers)
     print "after read test"
+    computeTFIDF(TFIDFtestunigram, TFIDFtestbigram, speakersPerTermTest, termScorePerSpeakerDictTest)
+    speakers = TFIDFtestunigram.keys()
+    testvectors = getVectors(speakersPerTermTrain, TFIDFtestunigram, TFIDFtestbigram, speakers)
+    testlabels = getLabels(speakers, convtospeakers, labelToUse)
+    outputCalculation("test_" + labelname,testvectors,testlabels)
     
     
-    computeTFIDF(TFIDFtest, speakersPerTermTest, termScorePerSpeakerDictTest)
-    speakers = TFIDFtest.keys()
-    testvectors = getVectors(speakersPerTermTrain, TFIDFtest, speakers)
-    testlabels = getLabels(speakers, convtospeakers)
     print "before predict"
-    predictions = clf.predict(testvectors)
+    #predictions = clf.predict(testvectors)
     print "after predict"
-    correct = 0
-    total = 0
-    for i in range(0,len(predictions)):
-        if predictions[i] == testlabels[i]:
-            correct += 1
-        total += 1
+    #correct = 0
+    #total = 0
+    #for i in range(0,len(predictions)):
+    #    if predictions[i] == testlabels[i]:
+    #        correct += 1
+    #    total += 1
     
-    print "Accuracy for gender: "
-    print float(correct) / total
+    #print "Accuracy for gender: "
+    #print float(correct) / total
     
     #clf.predict([[2., 2.]])
     
