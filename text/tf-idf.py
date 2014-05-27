@@ -1,10 +1,8 @@
 import sys,os
 import math
-import sklearn
 from os import walk
 from collections import Counter
 import re
-from sklearn import svm
 
 #Here we are computing TF-IDF on the corpus. We are treating each side of the conversation as a seperate document,
 #as we are interested in the characteristics of each individual speaker, not necessarily the conversation as a whole
@@ -32,8 +30,8 @@ stripSoundsRegex = re.compile('\[.+?\]')
 def outputTFIDF(TFIDFunigram, TFIDFbigram):
     outputfile2 = open('outputtop10unigram', 'w')
     outputfile3 = open('outputtop10bigram', 'w')
-    outputfile4 = open('outputtotal100unigram', 'w')
-    outputfile5 = open('outputtotal100bigram', 'w')
+    outputfile4 = open('outputtotal1000unigram', 'w')
+    outputfile5 = open('outputtotal1000bigram', 'w')
     for speaker in TFIDFunigram:
         outputfile2.write(speaker + "---\n")
         for entry in TFIDFunigram[speaker].most_common(10):
@@ -44,9 +42,9 @@ def outputTFIDF(TFIDFunigram, TFIDFbigram):
         for entry in TFIDFbigram[speaker].most_common(10):
             outputfile3.write(entry[0] + "," + str(entry[1]) + "\n")
             
-    for entry in globalTFIDFunigram.most_common(100):
+    for entry in globalTFIDFunigram.most_common(1000):
         outputfile4.write(entry[0] + "," + str(entry[1]) + "\n")
-    for entry in globalTFIDFbigram.most_common(100):
+    for entry in globalTFIDFbigram.most_common(1000):
         outputfile5.write(entry[0] + "," + str(entry[1]) + "\n")
     outputfile2.close()
     outputfile3.close()
@@ -64,6 +62,9 @@ def computeTFIDF(TFIDFunigram, TFIDFbigram, speakersPerTerm, termScorePerSpeaker
         
         for word in termScorePerSpeakerDict[speaker]:
             termscore = termScorePerSpeakerDict[speaker][word]
+            #boost stopwords
+            #if (word in stopwords or (len(word.split()) > 1 and word.split()[0] in stopwords and word.split()[1] in stopwords)):
+            #    termscore = termscore * 2
             inversedocfrequency = math.log(float(numSpeakers) / speakersPerTerm[word])
             
             if len(word.strip().split()) > 1:
@@ -154,7 +155,7 @@ def readFilesInDirectory(directory):
         files.extend(filenames)
         break
     returnlist = []
-    for file in files:
+    for file in files:  
         if file.endswith(".txt"):
             returnlist.append(directory + file)
     return returnlist
@@ -204,8 +205,8 @@ def getLabels(speakerlist, convtospeakers, labelToUse):
     
 def getVocabulary(allterms):
     validvocab = []
-    topunigrams = globalTFIDFunigram.most_common(1000)
-    topbigrams = globalTFIDFbigram.most_common(1000)
+    topunigrams = globalTFIDFunigram.most_common(10000)
+    topbigrams = globalTFIDFbigram.most_common(10000)
     for term in allterms:
         if len(term.strip().split()) > 1:
             if term.strip().split()[0] in stopwords and term.strip().split()[1] in stopwords:
@@ -267,7 +268,7 @@ def outputCalculation(prefix, vectors, labels):
 def loadStopList():
     curfile = open("stopwords", 'r')
     for word in curfile:
-        stopwords[word] += 1
+        stopwords[word.strip()] += 1
     
 def main():
     loadStopList()
@@ -315,7 +316,7 @@ def main():
     labels = getLabels(speakers, convtospeakers, labelToUse)
     print "after get labels"
     
-    outputCalculation("train_" + labelname, vectors, labels)
+    outputCalculation("./label_feats/train_" + labelname, vectors, labels)
     #clf = svm.SVC()
     #clf.fit(vectors, labels)
     print "after svm fit"
@@ -328,7 +329,7 @@ def main():
     speakers = TFIDFtestunigram.keys()
     testvectors = getVectors(speakersPerTermTrain, TFIDFtestunigram, TFIDFtestbigram, speakers)
     testlabels = getLabels(speakers, convtospeakers, labelToUse)
-    outputCalculation("test_" + labelname,testvectors,testlabels)
+    outputCalculation("./label_feats/test_" + labelname,testvectors,testlabels)
     
     
     print "before predict"
