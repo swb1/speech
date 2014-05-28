@@ -4,7 +4,7 @@ opensmile features, libsvm
 accent:
   classifier: 5
   regularization constant: 0.01
-  accuracy = 24.6436% (242/982)
+  accuracy = 26.5784% (261/982)
 
 age:
   classifier: 5
