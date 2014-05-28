@@ -22,7 +22,7 @@ gender:
   accuracy = 98.9817% (972/982)
   
 
-kaldi features, libsvm
+kaldi mfcc features, libsvm
 accent:
   classifier: 6
   regularization constant: 0.01
@@ -42,3 +42,25 @@ gender:
   classifier: 0
   regularization constant: 0.01
   accuracy = 91.7204% (853/930)
+
+
+opensmile + kaldi mfcc features, libsvm
+accent:
+  classifier: 2
+  regularization constant: 10
+  accuracy = 24.1952% (233/963)
+
+age:
+  classifier: 0
+  regularization constant: 10
+  accuracy = 33.9564% (327/963)
+
+education:
+  classifier: 2
+  regularization constant: 0.01
+  accuracy = 55.7632% (537/963)
+
+gender:
+  classifier: 6
+  regularization constant: 0.01
+  accuracy = 96.7809% (932/963)
