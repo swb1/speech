@@ -5,8 +5,11 @@ http://aclweb.org/anthology/P/P09/P09-1080.pdf
 Unsupervised feature learning for audio classification using convolutional deep belief networks
 http://web.eecs.umich.edu/~honglak/nips09-AudioConvolutionalDBN.pdf
 
+A Quantitative Analysis of Lexical Differences Between Genders in Telephone Conversations
+http://www.icsi.berkeley.edu/pubs/speech/lexicaldifferences05.pdf
+
 Below are the papers Dan suggested:
-A Tutorial on Text-Independent Speaker Veriﬁcation
+A Tutorial on Text-Independent Speaker Verification
 http://dl.acm.org/citation.cfm?id=1289376
 
 Support Vector Machines using GMM Supervectors for Speaker Verication
