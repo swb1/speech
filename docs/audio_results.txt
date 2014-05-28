@@ -3,20 +3,20 @@ here are the best results
 opensmile features, libsvm
 accent:
   classifier: 5
-  regularization constant: 10
-  accuracy = 41.8264% (371/887)
+  regularization constant: 0.01
+  accuracy = 24.6436% (242/982)
 
 age:
   classifier: 5
-  regularization constant: 10
-  accuracy = 48.929% (434/887)
+  regularization constant: 0.1
+  accuracy = 33.6049% (330/982)
 
 education:
-  classifier: 6
-  regularization constant: 10
-  accuracy = 59.752% (530/887)
+  classifier: 2
+  regularization constant: 0.01
+  accuracy = 51.9348% (510/982)
 
 gender:
   classifier: 6
   regularization constant: 1
-  accuracy = 98.7599% (876/887)
+  accuracy = 98.9817% (972/982)
