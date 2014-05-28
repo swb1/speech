@@ -20,3 +20,25 @@ gender:
   classifier: 6
   regularization constant: 1
   accuracy = 98.9817% (972/982)
+  
+
+kaldi features, libsvm
+accent:
+  classifier: 6
+  regularization constant: 0.01
+  accuracy = 22.6882% (211/930)
+
+age:
+  classifier: 6
+  regularization constant: 1
+  accuracy = 28.7097% (267/930)
+
+education:
+  classifier: 7
+  regularization constant: 10
+  accuracy = 52.7957% (491/930)
+
+gender:
+  classifier: 0
+  regularization constant: 0.01
+  accuracy = 91.7204% (853/930)
