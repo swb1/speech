@@ -1,0 +1,4 @@
+total number of speakers: 543
+total number of phone conversations: 2262
+total number of words in corpus:
+average number of words per speaker:
