@@ -21,7 +21,7 @@ def loaddata(filename):
   x=list(reader)
   result=np.array(x).astype('float')
   feats = result[:,1:]
-  labels = result[:,0]
+  labels = result[:,0].astype('int')
   return (feats, labels)
 
 (X_train, y_train) = loaddata(train_data)
