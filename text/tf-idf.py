@@ -19,6 +19,13 @@ SUPPORTFILESDIR = "../shared/"
 globalTFIDFunigram = Counter()
 globalTFIDFbigram = Counter()
 stopwords = Counter()
+scorePerTerm = Counter()
+labelCounts = Counter()
+KLScoresUnigram = Counter()
+KLScoresBigram = Counter()
+
+scorePerLabelAndTerm = {}
+speakerToLabels = {}
 
 stripCommentsRegex = re.compile('\{.+?\}')
 stripSoundsRegex = re.compile('\[.+?\]')
@@ -32,6 +39,8 @@ def outputTFIDF(TFIDFunigram, TFIDFbigram):
     outputfile3 = open('outputtop10bigram', 'w')
     outputfile4 = open('outputtotal1000unigram', 'w')
     outputfile5 = open('outputtotal1000bigram', 'w')
+    outputfile6 = open('outputtotal1000KLunigram', 'w')
+    outputfile7 = open('outputtotal1000KLbigram', 'w')
     for speaker in TFIDFunigram:
         outputfile2.write(speaker + "---\n")
         for entry in TFIDFunigram[speaker].most_common(10):
@@ -46,12 +55,18 @@ def outputTFIDF(TFIDFunigram, TFIDFbigram):
         outputfile4.write(entry[0] + "," + str(entry[1]) + "\n")
     for entry in globalTFIDFbigram.most_common(1000):
         outputfile5.write(entry[0] + "," + str(entry[1]) + "\n")
+    for entry in KLScoresUnigram.most_common(1000):
+        outputfile6.write(entry[0] + "," + str(entry[1]) + "\n")
+    for entry in KLScoresBigram.most_common(1000):
+        outputfile7.write(entry[0] + "," + str(entry[1]) + "\n")
     outputfile2.close()
     outputfile3.close()
     outputfile4.close()
     outputfile5.close()
+    outputfile6.close()
+    outputfile7.close()
 
-def computeTFIDF(TFIDFunigram, TFIDFbigram, speakersPerTerm, termScorePerSpeakerDict):
+def computeTFIDF(TFIDFunigram, TFIDFbigram, speakersPerTerm, termScorePerSpeakerDict, computeKL):
     numSpeakers = len(termScorePerSpeakerDict)
     print "num speakers: " + str(numSpeakers)
     for speaker in termScorePerSpeakerDict:
@@ -65,15 +80,44 @@ def computeTFIDF(TFIDFunigram, TFIDFbigram, speakersPerTerm, termScorePerSpeaker
             #boost stopwords
             #if (word in stopwords or (len(word.split()) > 1 and word.split()[0] in stopwords and word.split()[1] in stopwords)):
             #    termscore = termscore * 2
-            inversedocfrequency = math.log(float(numSpeakers) / speakersPerTerm[word])
+            inversedocfrequency = (float(numSpeakers) / speakersPerTerm[word])
             
             if len(word.strip().split()) > 1:
-                TFIDFbigram[speaker][word] = termscore * inversedocfrequency
-                globalTFIDFbigram[word] = max(termscore * inversedocfrequency, globalTFIDFunigram[word])  #/ numSpeakers
+                TFIDFbigram[speaker][word] = termscore #* inversedocfrequency
+                globalTFIDFbigram[word] = max(float(termscore) * inversedocfrequency, globalTFIDFbigram[word]) #/ numSpeakers
             else:
-                TFIDFunigram[speaker][word] = termscore * inversedocfrequency
-                globalTFIDFunigram[word] = max(termscore * inversedocfrequency, globalTFIDFunigram[word])  #/ numSpeakers
-       
+                TFIDFunigram[speaker][word] = termscore #* inversedocfrequency
+                globalTFIDFunigram[word] = max(float(termscore) * inversedocfrequency, globalTFIDFunigram[word]) #/ numSpeakers
+    
+    if computeKL:
+        totalTermCount = 0
+        for word in scorePerTerm:
+            totalTermCount += scorePerTerm[word]
+        totalLabels = 0
+        for label in labelCounts:
+            totalLabels += labelCounts[label]
+            
+        for word in scorePerTerm:
+            KL_DivergenceScore = 0
+            isValid = True
+            for label in labelCounts:
+                if scorePerLabelAndTerm[label][word] < 3:
+                    isValid = False
+                    break
+            
+            if isValid:
+                for label in labelCounts:
+                    p_ClassGivenWord = (float(scorePerLabelAndTerm[label][word]) / totalTermCount) / (float(scorePerTerm[word]) / totalTermCount)
+                    p_Class = float(labelCounts[label]) / totalLabels
+                    #print str(word) + "," + str(p_ClassGivenWord) + "," + str(p_Class) + "," + str(scorePerLabelAndTerm[label][word]) + "," + str(scorePerTerm[word]) + "," + str(totalTermCount) + "," + str(totalLabels)
+                    if p_ClassGivenWord == 0:
+                        KL_DivergenceScore += -0.000000000000000000001
+                    else:
+                        KL_DivergenceScore += p_ClassGivenWord * math.log(p_ClassGivenWord / p_Class)
+                if len(word.strip().split()) > 1:
+                    KLScoresBigram[word] = KL_DivergenceScore
+                else:
+                    KLScoresUnigram[word] = KL_DivergenceScore
 
 def processSpeakerText(speaker, text, wordsForSpeaker):
     #We strip out any double parens, for tf-idf we don't care about we assume the transcriber's guess was correct
@@ -95,7 +139,7 @@ def processSpeakerText(speaker, text, wordsForSpeaker):
         wordsForSpeaker[speaker][words[-1] + " [end]"] += 1
     #num times this term occurs in this doc * (number of documents / number of documents containing the term)
 
-def readSpeechFile(filepath, speakersPerTerm, termScorePerSpeakerDict, convtospeakers):
+def readSpeechFile(filepath, speakersPerTerm, termScorePerSpeakerDict, convtospeakers, curlabel):
     curfile = open(filepath, 'r')
     fulltext = curfile.read()
     #skipping the file header and getting the speech segments divided up
@@ -133,6 +177,13 @@ def readSpeechFile(filepath, speakersPerTerm, termScorePerSpeakerDict, convtospe
         else:
             speakerID = speakerIDs[1]
         topfrequency = wordsForSpeaker[speaker].most_common(1)[0][1]
+        
+        thislabel = speakerToLabels[speakerID][curlabel]
+        if thislabel not in scorePerLabelAndTerm:
+            scorePerLabelAndTerm[thislabel] = Counter()
+        
+        labelCounts[thislabel] += 1
+        
         for term in wordsForSpeaker[speaker]:
             count = wordsForSpeaker[speaker][term]
             augmentedFrequency = 0.5 + (0.5 * float(count) / topfrequency)
@@ -145,7 +196,9 @@ def readSpeechFile(filepath, speakersPerTerm, termScorePerSpeakerDict, convtospe
                     termScorePerSpeakerDict[speakerID][term] = augmentedFrequency
                 else:
                     termScorePerSpeakerDict[speakerID][term] += augmentedFrequency
-                       
+            
+            scorePerLabelAndTerm[thislabel][term] += count #augmentedFrequency         
+            scorePerTerm[term] += count
             speakersPerTerm[term] += 1
             
     
@@ -184,11 +237,9 @@ def getConvToSpeakers():
         speakerB = elements[2]
         convToSpeaker[conv] = [speakerA, speakerB]
     return convToSpeaker
-    
-def getLabels(speakerlist, convtospeakers, labelToUse):
+
+def loadLabels():
     curfile = open(SUPPORTFILESDIR + "person.txt", 'r')
-    speakerToLabels = {}
-    speakervector = []
     for line in curfile:
         elements = line.split()
         speaker = elements[0]
@@ -196,7 +247,10 @@ def getLabels(speakerlist, convtospeakers, labelToUse):
         labelB = elements[2]
         labelC = elements[3]
         labelD = elements[4]
-        speakerToLabels[speaker] = [labelA, labelB, labelC, labelD]   
+        speakerToLabels[speaker] = [labelA, labelB, labelC, labelD]
+        
+def getLabels(speakerlist, labelToUse):
+    speakervector = []
     for speaker in speakerlist:
         speakervector.append(speakerToLabels[speaker][labelToUse])
         
@@ -205,53 +259,46 @@ def getLabels(speakerlist, convtospeakers, labelToUse):
     
 def getVocabulary(allterms):
     validvocab = []
-    topunigrams = globalTFIDFunigram.most_common(10000)
-    topbigrams = globalTFIDFbigram.most_common(10000)
+    #topunigrams = globalTFIDFunigram.most_common(1200)
+    #topbigrams = globalTFIDFbigram.most_common(1200)
+    topKLunigrams = KLScoresUnigram.most_common(10000)
+    topKLbigrams = KLScoresBigram.most_common(10000)
     for term in allterms:
         if len(term.strip().split()) > 1:
             if term.strip().split()[0] in stopwords and term.strip().split()[1] in stopwords:
                 validvocab.append(term)
                 continue
-            else:
-                for entry in topbigrams:
-                    if term == entry[0]:
-                        validvocab.append(term)
-                        break
+            #else:
+            #    for entry in topKLbigrams:#topbigrams:
+            #        if term == entry[0]:
+            #            validvocab.append(term)
+            #            break
         else:
             if term in stopwords:
                 validvocab.append(term)
                 continue
-            else:
-                for entry in topunigrams:
-                    if term == entry[0]:
-                        validvocab.append(term)
-                        break
-         
+            #else:
+            #    for entry in topKLunigrams:#topunigrams:
+            #        if term == entry[0]:
+            #            validvocab.append(term)
+            #            break
+    validvocab.extend(topKLunigrams)
+    validvocab.extend(topKLbigrams)
     return validvocab
 
 
-def getVectors(speakersPerTermTrain, TFIDFunigram, TFIDFbigram, speakerlist):
+def getVectors(speakersPerTermTrain, TFIDFunigram, TFIDFbigram, speakerlist, terms):
     vector = []
-
-    terms = getVocabulary(sorted(speakersPerTermTrain.keys()))
     #print len(speakerlist)
     #print len(terms)
-    for speaker in speakerlist:
-        termvector = []
-        #[TFIDF[speaker][term] for term in terms]
-        for term in terms:
-            if len(term.strip().split()) > 1:
-                if term in TFIDFbigram[speaker]:
-                    termvector.append(TFIDFbigram[speaker][term])
-                else:
-                    termvector.append("0")
-            else:
-                if term in TFIDFunigram[speaker]:
-                    termvector.append(TFIDFunigram[speaker][term])
-                else:
-                    termvector.append("0")
-        vector.append(termvector)
+    averagepercent = 0
 
+    #for speaker in speakerlist:
+    #vector = [[KLScoresBigram[term] if term in KLScoresBigram else KLScoresUnigram[term] if term in KLScoresUnigram else "0" for term in terms] for speaker in speakerlist]
+    vector = [[TFIDFbigram[speaker][term]*KLScoresBigram[term] if term in TFIDFbigram[speaker] else TFIDFunigram[speaker][term]*KLScoresUnigram[term] if term in TFIDFunigram[speaker] else "0" for term in terms] for speaker in speakerlist]
+    #    vector.append(termvector)
+    #print ("Average zero percentage:")
+    #print (float(averagepercent) / (len(speakerlist)*len(terms)))
     return vector
     
 def outputCalculation(prefix, vectors, labels):
@@ -272,6 +319,7 @@ def loadStopList():
     
 def main():
     loadStopList()
+    loadLabels()
     labelToUse = int(sys.argv[1])
     labelname = ""
     if labelToUse == 0:
@@ -301,19 +349,21 @@ def main():
     
     print "before read in"
     for file in trainfiles:
-        readSpeechFile(file, speakersPerTermTrain, termScorePerSpeakerDictTrain, convtospeakers)
+        readSpeechFile(file, speakersPerTermTrain, termScorePerSpeakerDictTrain, convtospeakers, labelToUse)
     print "after read in"
-    computeTFIDF(TFIDFtrainunigram, TFIDFtrainbigram, speakersPerTermTrain, termScorePerSpeakerDictTrain)
+    computeTFIDF(TFIDFtrainunigram, TFIDFtrainbigram, speakersPerTermTrain, termScorePerSpeakerDictTrain, True)
     print "after compute tfidf"
     outputTFIDF(TFIDFtrainunigram, TFIDFtrainbigram)
     print "after output"
     speakers = TFIDFtrainunigram.keys()
     
+    terms = getVocabulary(sorted(speakersPerTermTrain.keys()))
+    
     print "after get convtospeaker"
-    vectors = getVectors(speakersPerTermTrain, TFIDFtrainunigram, TFIDFtrainbigram, speakers)
+    vectors = getVectors(speakersPerTermTrain, TFIDFtrainunigram, TFIDFtrainbigram, speakers, terms)
     #print vectors
     print "after get vectors"
-    labels = getLabels(speakers, convtospeakers, labelToUse)
+    labels = getLabels(speakers, labelToUse)
     print "after get labels"
     
     outputCalculation("./label_feats/train_" + labelname, vectors, labels)
@@ -323,12 +373,12 @@ def main():
     TFIDFtestunigram = {}
     TFIDFtestbigram = {}
     for file in testfiles:
-        readSpeechFile(file, speakersPerTermTest, termScorePerSpeakerDictTest, convtospeakers)
+        readSpeechFile(file, speakersPerTermTest, termScorePerSpeakerDictTest, convtospeakers, labelToUse)
     print "after read test"
-    computeTFIDF(TFIDFtestunigram, TFIDFtestbigram, speakersPerTermTest, termScorePerSpeakerDictTest)
+    computeTFIDF(TFIDFtestunigram, TFIDFtestbigram, speakersPerTermTest, termScorePerSpeakerDictTest, False)
     speakers = TFIDFtestunigram.keys()
-    testvectors = getVectors(speakersPerTermTrain, TFIDFtestunigram, TFIDFtestbigram, speakers)
-    testlabels = getLabels(speakers, convtospeakers, labelToUse)
+    testvectors = getVectors(speakersPerTermTrain, TFIDFtestunigram, TFIDFtestbigram, speakers, terms)
+    testlabels = getLabels(speakers, labelToUse)
     outputCalculation("./label_feats/test_" + labelname,testvectors,testlabels)
     
     
