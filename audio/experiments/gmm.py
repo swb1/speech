@@ -12,8 +12,9 @@ from sklearn.mixture import GMM
   each row is a data point; the row is comma separated, the first element is the label, and the rest are the features
 '''
 
-train_data = 'age.train'
-test_data = 'age.test'
+prop = 'age'
+train_data = prop + '.train'
+test_data = prop + '.test'
 
 def loaddata(filename):
   reader=csv.reader(open(filename,"r"),delimiter=',')
