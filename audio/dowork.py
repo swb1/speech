@@ -52,6 +52,11 @@ test_gender = open('test_gender.lsvm','w')
 test_edu = open('test_edu.lsvm','w')
 test_accent = open('test_accent.lsvm','w')
 
+train_count = 0
+test_count = 0
+train_pers = set()
+test_pers = set()
+
 random.seed(10)
 for f in os.listdir('feats'):
   # 80% train/20% test
@@ -62,6 +67,11 @@ for f in os.listdir('feats'):
   (convid,perid) = getids(f)
   g = open('feats/' + f, 'r')
 
+  if perid in train_pers:
+    istrain = True
+  elif perid in test_pers:
+    istrain = False
+
   line = ''
   # only 1 line in g
   for l in g:
@@ -69,15 +79,19 @@ for f in os.listdir('feats'):
 
   # age, gender, accent, education
   if istrain:
+    train_pers.add(perid)
     train_age.write(person[perid][0] + ' ' + line + '\n')
     train_gender.write(person[perid][1] + ' ' + line + '\n')
     train_accent.write(person[perid][2] + ' ' + line + '\n')
     train_edu.write(person[perid][3] + ' ' + line + '\n')
+    train_count += 1
   else:
+    test_pers.add(perid)
     test_age.write(person[perid][0] + ' ' + line + '\n')
     test_gender.write(person[perid][1] + ' ' + line + '\n')
     test_accent.write(person[perid][2] + ' ' + line + '\n')
     test_edu.write(person[perid][3] + ' ' + line + '\n')
+    test_count += 1
 
 train_age.close()
 train_gender.close()
@@ -88,3 +102,7 @@ test_age.close()
 test_gender.close()
 test_edu.close()
 test_accent.close()
+
+train_per = train_count*1.0/(train_count + test_count)
+print('training percentage is ' + str(train_per))
+print('test percentage is ' + str(1 - train_per))
