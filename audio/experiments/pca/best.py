@@ -1,6 +1,10 @@
+'''
+  print the best file's name and its train/test accuracies
+'''
+
 import sys,os
 
-prop = 'age'
+prop = sys.argv[1]
 
 bestfile = ''
 besttrainacc = -1
