@@ -12,7 +12,7 @@ from sklearn.mixture import GMM
   each row is a data point; the row is comma separated, the first element is the label, and the rest are the features
 '''
 
-prop = 'age'
+prop = 'edu'
 train_data = prop + '.train'
 test_data = prop + '.test'
 
