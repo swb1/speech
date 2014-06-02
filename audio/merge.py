@@ -1,9 +1,7 @@
-'''
-  generate original labelled files for all four categories
-'''
-
 import sys,os
 import random
+
+outdir = 'label_merge_feats/'
 
 # populate conv2per
 def getconv2per():
@@ -41,36 +39,53 @@ conv2per = getconv2per()
 person = getperson()
 
 # training files
-train_age = open('label_feats/train_age.lsvm','w')
-train_gender = open('label_feats/train_gender.lsvm','w')
-train_edu = open('label_feats/train_edu.lsvm','w')
-train_accent = open('label_feats/train_accent.lsvm','w')
+train_age = open(outdir + 'train_merge_age.lsvm','w')
+train_gender = open(outdir + 'train_merge_gender.lsvm','w')
+train_edu = open(outdir + 'train_merge_edu.lsvm','w')
+train_accent = open(outdir + 'train_merge_accent.lsvm','w')
 
 # valid files
-valid_age = open('label_feats/valid_age.lsvm','w')
-valid_gender = open('label_feats/valid_gender.lsvm','w')
-valid_edu = open('label_feats/valid_edu.lsvm','w')
-valid_accent = open('label_feats/valid_accent.lsvm','w')
+valid_age = open(outdir + 'valid_merge_age.lsvm','w')
+valid_gender = open(outdir + 'valid_merge_gender.lsvm','w')
+valid_edu = open(outdir + 'valid_merge_edu.lsvm','w')
+valid_accent = open(outdir + 'valid_merge_accent.lsvm','w')
 
 # test files
-test_age = open('label_feats/test_age.lsvm','w')
-test_gender = open('label_feats/test_gender.lsvm','w')
-test_edu = open('label_feats/test_edu.lsvm','w')
-test_accent = open('label_feats/test_accent.lsvm','w')
+test_age = open(outdir + 'test_merge_age.lsvm','w')
+test_gender = open(outdir + 'test_merge_gender.lsvm','w')
+test_edu = open(outdir + 'test_merge_edu.lsvm','w')
+test_accent = open(outdir + 'test_merge_accent.lsvm','w')
 
-train_count = 0.0
-valid_count = 0.0
-test_count = 0.0
+def process_lines(fcount, lines):
+  # remove key
+  lines.pop(0)
 
-train_pers = set()
-valid_pers = set()
-test_pers = set()
+  random.shuffle(lines)
+  count = 0
+  ret = ''
+
+  for line in lines:
+    count += 1
+    if count > 1000:
+      break
+
+    parts = line.split()
+    if len(parts) == 14:
+      parts.pop(13)
+
+    for p in parts:
+      ret += str(fcount) + ':' + p.strip() + ' '
+      fcount += 1
+
+  return (fcount, ret)
+
+train_per = set()
+valid_per = set()
+test_per = set()
 
 random.seed(10)
 for f in os.listdir('feats'):
   # 64% train/ 16% valid/ 20% test
-
-  # 0 - train, 1 - valid, 2 - test
   option = 0
   r = random.random()
   if r <= 0.64:
@@ -78,46 +93,65 @@ for f in os.listdir('feats'):
   elif r <= 0.8:
     option = 1
   else:
-    assert r<= 1
     option = 2
 
   (convid,perid) = getids(f)
-  g = open('feats/' + f, 'r')
+  h = open('feats/' + f, 'r')
 
-  if perid in train_pers:
+  if perid in train_per:
     option = 0
-  elif perid in valid_pers:
+  elif perid in valid_per:
     option = 1
-  elif perid in test_pers:
+  elif perid in test_per:
     option = 2
 
   line = ''
-  # only 1 line in g
-  for l in g:
-    line = l[1:].strip()
+  # only 1 line in h
+  for l in h:
+    line = l[1:].strip() + ' '
+  h.close()
+
+  # last feature count in opsm file + 1
+  fcount = int(line.strip().rsplit(' ',1)[1].split(':')[0]) + 1
+
+  # f in the form of: raw_mfcc_sw0xxxx-A/B.ark
+  filename = f.split('.')[0] + '.txt'
+  os.system('bin/copy-feats ark:mfcc/raw_mfcc_' + f.split('.')[0] + '.ark ark,t:- > ' + filename)
+
+  g = open(filename, 'r')
+
+  # pick 1000 samples
+  lines = g.readlines()
+  if len(lines) < 1000:
+    continue
+  (fcount, new_line) = process_lines(fcount, lines)
+  if fcount != 13385:
+    print fcount
+    sys.exit(0)
+  line += new_line
+
+  os.system('rm ' + filename)
+  g.close()
 
   # age, gender, accent, education
   if option == 0:
-    train_pers.add(perid)
+    train_per.add(perid)
     train_age.write(person[perid][0] + ' ' + line + '\n')
     train_gender.write(person[perid][1] + ' ' + line + '\n')
     train_accent.write(person[perid][2] + ' ' + line + '\n')
     train_edu.write(person[perid][3] + ' ' + line + '\n')
-    train_count += 1
   elif option == 1:
-    valid_pers.add(perid)
+    valid_per.add(perid)
     valid_age.write(person[perid][0] + ' ' + line + '\n')
     valid_gender.write(person[perid][1] + ' ' + line + '\n')
     valid_accent.write(person[perid][2] + ' ' + line + '\n')
     valid_edu.write(person[perid][3] + ' ' + line + '\n')
-    valid_count += 1
   else:
-    test_pers.add(perid)
+    test_per.add(perid)
     test_age.write(person[perid][0] + ' ' + line + '\n')
     test_gender.write(person[perid][1] + ' ' + line + '\n')
     test_accent.write(person[perid][2] + ' ' + line + '\n')
     test_edu.write(person[perid][3] + ' ' + line + '\n')
-    test_count += 1
 
 train_age.close()
 train_gender.close()
@@ -133,8 +167,3 @@ test_age.close()
 test_gender.close()
 test_edu.close()
 test_accent.close()
-
-tot = train_count + valid_count + test_count
-print('training percentage is ' + str(train_count/tot))
-print('valid percentage is ' + str(valid_count/tot))
-print('test percentage is ' + str(test_count/tot))
