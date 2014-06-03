@@ -16,6 +16,9 @@ http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=4013537
 Speaker Recognition based on Idiolectal Differences between Speakers
 http://perso.telecom-paristech.fr/~chollet/Biblio/Congres/Audio/Eurospeech01/CDROM/papers/page2521.pdf
 
+Age Estimation from Telephone Speech using i-vectors
+https://lirias.kuleuven.be/bitstream/123456789/355917/1/3471.pdf
+
 Peter to read:
 Modeling Latent Biographic Attributes in Conversational Genres
 http://aclweb.org/anthology/P/P09/P09-1080.pdf
