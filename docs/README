@@ -2,3 +2,12 @@ all documents go here
 
 papers.txt:
 a list of papers each group member found that may be useful for the project
+
+audio_results.txt:
+classification results using different methods
+
+priors.txt:
+number of data points in each class for each property
+
+stats.txt:
+some statistics about the corpus, etc

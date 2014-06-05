@@ -143,7 +143,6 @@
 /afs/ir/data/linguistic-data/Switchboard/Audio-swbd1ph2/cd02/swb1/sw02232.sph /afs/ir/data/linguistic-data/Switchboard/Switchboard-Transcripts/swb1/trans/phase1/disc03/sw2232.mrk
 /afs/ir/data/linguistic-data/Switchboard/Audio-swbd1ph2/cd02/swb1/sw02233.sph /afs/ir/data/linguistic-data/Switchboard/Switchboard-Transcripts/swb1/trans/phase1/disc03/sw2233.mrk
 /afs/ir/data/linguistic-data/Switchboard/Audio-swbd1ph2/cd02/swb1/sw02234.sph /afs/ir/data/linguistic-data/Switchboard/Switchboard-Transcripts/swb1/trans/phase1/disc03/sw2234.mrk
-/afs/ir/data/linguistic-data/Switchboard/Audio-swbd1ph2/cd02/swb1/sw02235.sph /afs/ir/data/linguistic-data/Switchboard/Switchboard-Transcripts/swb1/trans/phase1/disc03/sw2235.mrk
 /afs/ir/data/linguistic-data/Switchboard/Audio-swbd1ph2/cd02/swb1/sw02237.sph /afs/ir/data/linguistic-data/Switchboard/Switchboard-Transcripts/swb1/trans/phase1/disc03/sw2237.mrk
 /afs/ir/data/linguistic-data/Switchboard/Audio-swbd1ph2/cd02/swb1/sw02239.sph /afs/ir/data/linguistic-data/Switchboard/Switchboard-Transcripts/swb1/trans/phase1/disc03/sw2239.mrk
 /afs/ir/data/linguistic-data/Switchboard/Audio-swbd1ph2/cd02/swb1/sw02241.sph /afs/ir/data/linguistic-data/Switchboard/Switchboard-Transcripts/swb1/trans/phase1/disc03/sw2241.mrk

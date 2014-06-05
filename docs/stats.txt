@@ -1,0 +1,6 @@
+total number of speakers: 543
+total number of phone conversations: 2262
+total duration of all audio files: (for Shi)
+average audio duration per speaker: (for Shi)
+total number of words in corpus:
+average number of words per speaker:

@@ -1,12 +1,10 @@
 Shi:
-Modeling Latent Biographic Attributes in Conversational Genres
-http://aclweb.org/anthology/P/P09/P09-1080.pdf
 
 Unsupervised feature learning for audio classification using convolutional deep belief networks
 http://web.eecs.umich.edu/~honglak/nips09-AudioConvolutionalDBN.pdf
 
 Below are the papers Dan suggested:
-A Tutorial on Text-Independent Speaker Veriﬁcation
+A Tutorial on Text-Independent Speaker Verification
 http://dl.acm.org/citation.cfm?id=1289376
 
 Support Vector Machines using GMM Supervectors for Speaker Verication
@@ -18,4 +16,15 @@ http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=4013537
 Speaker Recognition based on Idiolectal Differences between Speakers
 http://perso.telecom-paristech.fr/~chollet/Biblio/Congres/Audio/Eurospeech01/CDROM/papers/page2521.pdf
 
-Peter:
+Age Estimation from Telephone Speech using i-vectors
+https://lirias.kuleuven.be/bitstream/123456789/355917/1/3471.pdf
+
+Peter to read:
+Modeling Latent Biographic Attributes in Conversational Genres
+http://aclweb.org/anthology/P/P09/P09-1080.pdf
+
+A Quantitative Analysis of Lexical Differences Between Genders in Telephone Conversations
+http://www.icsi.berkeley.edu/pubs/speech/lexicaldifferences05.pdf
+
+An Extensive Empirical Study of Feature Selection Metrics for Text Classification
+http://jmlr.org/papers/volume3/forman03a/forman03a_full.pdf

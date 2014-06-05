@@ -1,0 +1,25 @@
+here are the best results
+
+10000 bigrams, 10000 unigrams, stop-words included (large list seems to do better), libsvm
+
+accent: 
+    2000/2000/stop-words
+    classifier: 6
+    regularization: 0.1
+    22.64%
+age:
+    10000/10000/stop-words
+    classifier: 6
+    regularization: 0.01
+    35.04%
+    
+education:
+    10000/10000/stop-words
+    classifier: 5
+    regularization: 0.01
+    58.83%
+gender:
+    3000/3000/no-stop-words
+    classifier: 3 
+    regularization constant: 1
+    accuracy: 83.33%

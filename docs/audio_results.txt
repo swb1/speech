@@ -1,0 +1,66 @@
+here are the best results
+
+opensmile features, libsvm
+accent:
+  classifier: 5
+  regularization constant: 0.01
+  accuracy = 26.5784% (261/982)
+
+age:
+  classifier: 5
+  regularization constant: 0.1
+  accuracy = 33.6049% (330/982)
+
+education:
+  classifier: 2
+  regularization constant: 0.01
+  accuracy = 51.9348% (510/982)
+
+gender:
+  classifier: 6
+  regularization constant: 1
+  accuracy = 98.9817% (972/982)
+  
+
+kaldi mfcc features, libsvm
+accent:
+  classifier: 6
+  regularization constant: 0.01
+  accuracy = 22.6882% (211/930)
+
+age:
+  classifier: 6
+  regularization constant: 1
+  accuracy = 28.7097% (267/930)
+
+education:
+  classifier: 7
+  regularization constant: 10
+  accuracy = 52.7957% (491/930)
+
+gender:
+  classifier: 0
+  regularization constant: 0.01
+  accuracy = 91.7204% (853/930)
+
+
+opensmile + kaldi mfcc features, libsvm
+accent:
+  classifier: 2
+  regularization constant: 10
+  accuracy = 24.1952% (233/963)
+
+age:
+  classifier: 0
+  regularization constant: 10
+  accuracy = 33.9564% (327/963)
+
+education:
+  classifier: 2
+  regularization constant: 0.01
+  accuracy = 55.7632% (537/963)
+
+gender:
+  classifier: 6
+  regularization constant: 0.01
+  accuracy = 96.7809% (932/963)

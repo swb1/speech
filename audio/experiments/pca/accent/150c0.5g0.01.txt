@@ -1,0 +1,5 @@
+number of classes is 9
+train accuracy:
+0.434229137199
+test accuracy:
+0.269857433809
