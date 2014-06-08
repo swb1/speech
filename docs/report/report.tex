@@ -54,7 +54,7 @@ Bahari et al. extracted speech patterns based on i-vectors \cite{dehak}, then ap
 
 Here, $m$ is the speaker- and channel-independent mean supervector. The i-vector is represented as $w$.
 
-Bahari et al. used a 60 dimensional feature vector consisting of 20 MFCCs appended by their derivatives to train the GMM system, and used a variation of $\mu$ and $m$ to obtain the i-vector. They showed that the age is best estimated without any dimension reduction on the i-vector, and the mean absolute error (MAE) in years for male and female speakers' age is 7.63 and 7.61, respectively.
+Bahari et al. used a 60 dimensional feature vector consisting of 20 MFCCs appended by the first and second order derivatives to train the GMM system, and used a variation of $\mu$ and $m$ to obtain the i-vector. They showed that the age is best estimated without any dimension reduction on the i-vector, and the mean absolute error (MAE) in years for male and female speakers' age is 7.63 and 7.61, respectively.
 
 Garera and Yarowsky discussed several techniques to classify gender, age, etc using text only \cite{garera}. They used unigrams and bigrams with top tf-idf scores and stopwords as the features, and a linear SVM classifier for training and testing. For gender/age detection, they found the partner of a conversation has strong influence on the choice of words on both sides. Thus, they classify both partners jointly, e.g., male-male vs rest or female-female vs rest, and achieved better accuracy than classifying each partner separately. In addition, they found sociolinguistic features such as speaker rate and pronoun usage are good indicators of gender, etc.
 
@@ -73,175 +73,37 @@ As for the speaker properties, there are 2 genders, 5 education levels, 10 Ameri
 \label{dists}
 \end{figure}
 
+\subsection{Feature Selection}
+\subsubsection{Audio}
+We have tried three different types of features for audio, namely, openSMILE, MFCC and openSMILE+MFCC. We used the same feature for each property estimation.
+
 \begin{itemize}
-%\itemsep -1.3mm
-\item Proceedings will be created in A4 paper size.
-Authors must therefore submit their papers in A4 paper size.
-\item Two columns are used except for the title part and possibly for large 
-figures that need a full page width.
-\item Left margin is 20 mm.
-\item Column width is 80 mm.
-\item Spacing between columns is 10 mm.
-\item Top margin 25 mm (except for the first page which is 30 mm to the title top).
-\item Text height (without headers and footers) is maximum 235 mm.
-\item Headers and footers must be left empty.
-The conference publication company will add information for publication.
-\item Check indentations and spacings by comparing to this 
-example file (in PDF).
+\item openSMILE \cite{eyben}: there are 384 features including the characteristics for the signal energy, MFCC and F0, etc. We think these are useful to identify gender and age, etc.
+\item MFCC: we used Kaldi to extract MFCC
+\item openSMILE+MFCC:
 \end{itemize}
 
+\subsubsection{Text}
 
-\subsubsection{Headings}
-Section headings are centered in boldface with the first word capitalized and the rest of the heading in lower case.
-Sub-headings appear like major headings, except they start at the left margin in the column.
-Sub-sub-headings appear like sub-headings, except they are in italics and not boldface.
-See the examples given in this file.
-No more than 3 levels of headings should be used.
+\subsection{Classifiers}
 
+\section{Experiments}
+\subsection{Experimental Setup and Implementation Details}
+\subsection{Audio}
+\subsubsection{Features}
+\subsubsection{Classifiers}
 
-\subsection{Text font}
-Times or Times Roman font is used for the main text. 
-Font size in the main text must be 9 points, and in the References section 8 points.
-Other font types may be used if needed for special purposes.
-All fonts must be embedded during the formation of the final PDF.
+\subsection{Text}
+\subsubsection{Features}
+\subsubsection{Classifiers}
+\subsubsection{Most Discriminative Words for Gender}
+\subsubsection{Speech Recognition System Simulation}
 
-\LaTeX\ users: users should use Adobe Type 1 fonts such as Times or Times Roman.
-These are used automatically by the interspeech2012.sty style file.
-Authors must not use Type 3 (bitmap) fonts.
-
-
-\subsection{Figures}
-All figures must be centered on the column (or page, if the figure spans both columns).
-Figure captions should follow each figure and have the format given in Fig.~\ref{spprod}.
-
-Figures should preferably be line drawings.
-If they contain gray levels or colors, they should be checked to print well on a high-quality non-color laser printer.
-
-Graphics (i.\thinspace{}e.\ illustrations, figures) should not use stipple fill patterns because they may not reproduce properly.
-Please use only \emph{solid} fill colors.
-
-Figures which span two columns (i.\thinspace{}e.\ occupy full page width) should be placed at the top or bottom of a page.
-
-
-\subsection{Tables}
-An example of a table is shown as Table~\ref{table1}.
-Somewhat different styles are allowed according to the type and purpose of the table.
-The caption text may be above or below the table.
-
-\begin{table} [t,h]
-\caption{\label{table1} {\it This is an example of a table.}}
-\vspace{2mm}
-\centerline{
-\begin{tabular}{|c|c|}
-\hline
-ratio & decibels \\
-\hline  \hline
-1/1 & 0 \\
-2/1 & $\approx 6$ \\
-3.16 & 10 \\
-10/1 & 20 \\ 
-1/10 & -20 \\
-100/1 & 40 \\
-1000/1 & 60 \\
-\hline
-\end{tabular}}
-\end{table}
-
-
-\subsection{Equations}
-Equations should be placed on separate lines and numbered.
-Examples of equations are given below.
-Particularly,
-
-\begin{equation}
-x(t) = s(f_\omega(t))
-\label{eq1}
-\end{equation}
-where \(f_\omega(t)\) is a special warping function
-\begin{equation}
-f_\omega(t)=\frac{1}{2\pi j}\oint_C \frac{\nu^{-1k}d\nu}
-{(1-\beta\nu^{-1})(\nu^{-1}-\beta)}
-\label{eq2}
-\end{equation}
-A residue theorem states that
-\begin{equation}
-\oint_C F(z)dz=2 \pi j \sum_k Res[F(z),p_k]
-\label{eq3}
-\end{equation}
-Applying (\ref{eq3}) to (\ref{eq1}), 
-it is straightforward to see that
-\begin{equation}
-1 + 1 = \pi
-\label{eq4}
-\end{equation}
-
-Finally we have proven the secret theorem of all speech sciences. 
-No more math is needed to show how useful the result is! 
-
-\begin{figure}[t]
-\centerline{\includegraphics[width=80mm]{figure}}
-\caption{{\it Schematic diagram of speech production.}}  
-\label{spprod}
-\end{figure}
-
-
-\subsection{Hyperlinks}
-For technical reasons, the proceedings editor will strip all active links from the papers during processing.
-Hyperlinks can be included in your paper, if written in full, e.\thinspace{}g.\ "http://www.foo.com/index.html".
-The link text must be all black.
-Please make sure that they present no problems in printing to paper.
-
-
-\subsection{Multimedia files}
-The InterSpeech 2012 organizing committee offers the possibility to submit multimedia files.
-These files are meant for audio-visual illustrations that cannot be conveyed in text, tables and graphs.
-Just like you would when including graphics, make sure that you have sufficient author rights to the multimedia materials that you submit for publication.
-The proceeding media will \emph{not} contain readers or players, so be sure to use widely accepted file formats and codecs, such as .mpg for video, .wav or .mp3 for audio,  and .png or .jpg for images.
-The files you submit will be accessible from the abstract cards on the media and via a bookmark in the manuscript.
-From within the manuscript, refer to a multimedia illustration by its filename.
-Use short file names without blanks.
-
-
-\subsection{Page numbering}
-Final page numbers will be added later to the document electronically. 
-{\em Don't make any footers or headers!}
-
-
-\subsection{References}
-The reference format is the standard IEEE one.
-References should be numbered in order of appearance, 
-for example here~\cite{ES1}, there~\cite{ES2}, and everywhere~\cite{ES3}.
-Don't refer to citations as if they were parts of speech.
-
-
-\subsection{Abstract}
-The total length of the abstract is limited to 1000 characters.
-The abstract included in your paper and the one you enter during web-based submission must be identical.
-Avoid non-ASCII characters or symbols as they may not display correctly in the abstract book.
-
-
-\subsection{Author affiliation}
-Please list country names as part of the affiliation for each country.
-
-
-\subsection{Submitted files}
-Authors are requested to submit PDF files of their manuscripts.
-You can use commercially available tools or for instance http://www.pdfforge.org/products/pdfcreator, or pdflatex.
-The PDF file should comply with the following requirements:
-(a) there must be no password protection on the PDF file at all;
-(b) all fonts must be embedded; and
-(c) the file must be text searchable (do CTRL-F and try to find a common word such as 'the').
-The proceedings editors will contact authors of non-complying files to obtain a replacement.
-In order not to endanger the preparation of the proceedings, papers for which a replacement is not provided timely will be withdrawn.
-
+\subsection{Audio + Text}
 
 \section{Conclusions}
-Authors must proof read their PDF file prior to submission to ensure it is correct.
-Authors should not rely on proofreading their source file.
-Please proofread the final PDF file before it is submitted.
 
 \section{Acknowledgements}
-The InterSpeech 2012 organizing committee would like to thank the organizing committee of InterSpeech 2008, 2009, 2010, 2011 for their help and for kindly providing the template files.
 
 \eightpt
 \bibliographystyle{IEEEtran}
@@ -261,6 +123,13 @@ ACL/IJCNLP, 2009
 \bibitem[4]{boulis} Boulis, B and Ostendorf, M.,
 ``A Quantitative Analysis of Lexical Differences Between Genders in Telephone Conversations'',
 ACL, 2005
+
+\bibitem[5]{eyben} Eyben F., Wöllmer. M. and Schuller, B.,
+``openSMILE – The Munich Versatile and Fast Open-Source Audio Feature Extractor'',
+ACM Multimedia, 2010
+
+\bibitem[6]{povey} Povey D., et al.,
+``The Kaldi Speech Recognition Toolkit''.
 
 \end{thebibliography}
 \end{document}
