@@ -56,13 +56,23 @@ Here, $m$ is the speaker- and channel-independent mean supervector. The i-vector
 
 Bahari et al. used a 60 dimensional feature vector consisting of 20 MFCCs appended by their derivatives to train the GMM system, and used a variation of $\mu$ and $m$ to obtain the i-vector. They showed that the age is best estimated without any dimension reduction on the i-vector, and the mean absolute error (MAE) in years for male and female speakers' age is 7.63 and 7.61, respectively.
 
-Garera and Yarowsky discusses several techniques to classify gender, age, etc using text only \cite{garera}. They used unigrams and bigrams with top tf-idf scores and stopwords as the features, and a linear SVM classifier for training and testing. For gender/age detection, they found the partner of a conversation has strong influence on the choice of words on both sides. Thus, they classify both partners jointly, e.g., male-male vs rest or female-female vs rest, and achieved better accuracy than classifying each partner separately. In addition, they found sociolinguistic features such as speaker rate and pronoun usage are good indicators of gender, etc.
+Garera and Yarowsky discussed several techniques to classify gender, age, etc using text only \cite{garera}. They used unigrams and bigrams with top tf-idf scores and stopwords as the features, and a linear SVM classifier for training and testing. For gender/age detection, they found the partner of a conversation has strong influence on the choice of words on both sides. Thus, they classify both partners jointly, e.g., male-male vs rest or female-female vs rest, and achieved better accuracy than classifying each partner separately. In addition, they found sociolinguistic features such as speaker rate and pronoun usage are good indicators of gender, etc.
 
 Boulis and Ostendorf analyzed the differences in word use between genders using phone conversation transcripts \cite{boulis}. To obtain the best classification accuracy of conversation sides according to the genders, they used the top 70\% of all bigrams in the corpus as features, sorted by the KL distance, the tf-idf as the feature scores and SVM as the classifier. This achieved an accuracy of around 93\%. However, using only 3\% of the top bigrams can still achieve around 90\% accuracy. Further, they found the conversation partners influence each other's linguistic patterns; hence, it is easier to classify same-gender conversations than cross-gender. 
 
 \section{Methods}
 
-\subsection{Basic layout features}
+\subsection{Datasets}
+We are using the Switchboard Phase 2 corpus which was recorded in 1991/2. There are 543 speakers and 2262 phone conversations, consisting of 243 hours of speaking time, and 2.9M spoken words. We want to separate out the two speakers in each conversation. For audio files, we used sox to extract the conversation side for each speaker, and concatenate all segments together. For text files, we extract and concatenate the utterences by speakers.
+
+As for the speaker properties, there are 2 genders, 5 education levels, 10 American English accents and 6 age groups (grouped by decades). Their distributions are plotted in Figure \ref{dists}. For age, we also used regression to compute mean absolute error (MAE) using chronological age.
+
+\begin{figure}[t]
+\centerline{\includegraphics[width=80mm]{figure}}
+\caption{{\it Speaker property distributions}}  
+\label{dists}
+\end{figure}
+
 \begin{itemize}
 %\itemsep -1.3mm
 \item Proceedings will be created in A4 paper size.
