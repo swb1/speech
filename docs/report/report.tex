@@ -38,25 +38,29 @@
 
 
 \begin{abstract}
-This is the paper layout specification and template definition for the InterSpeech 2012 Conference, which will be held in Portland, Oregon, USA.
-This template has been generated from previous InterSpeech templates and is sized in A4 (ISO 216, 210 mm $\times$ 297 mm).
-The format is essentially the one used for the IEEE ICASSP conferences.
-You must include index terms as shown below.
+In this report, we investigate various methods to estimate a speaker's background information using their phone conversations and the corresponding transcripts. Among other results, we achieved 98\% estimation accuracy in gender, and 68\% in education level using speech data alone. This report also includes the most discriminative words for gender derived from the KL distance, and a simulation of a speech recognition system to show the robustness of our methods using the ``transcribed'' text.
 \end{abstract}
-\noindent{\bf Index Terms}: speech synthesis, unit selection, join costs
 
 
 \section{Introduction}
-This template can be found on the conference website.
-Please use either an OpenOffice, MS-Word\textsuperscript{\textregistered} or a \LaTeX format file when preparing your submission.
-Information for full paper submission is available on the conference web site.
+Being able to automatically identify a speaker's background information in a phone conversation can have many benefits. For example, when a human interacts with a conversational agent, knowing the person's age can help machines customize their responses. Other usages may include targeted advertising and criminal investigation. In this report, we estimate a speaker's age, gender, education level and American English accent using their speech and transcripts in phone conversations.
 
+\section{Related Work}
+Bahari et al. extracted speech patterns based on i-vectors \cite{dehak}, then apply Support Vector Regression (SVR) to estimate the age of speakers \cite{bahari}. An i-vector or identity vector is a low-dimensional representation of a speaker obtained by projecting the speaker utterance onto the total variability space, which contains both speaker and channel variability (the basis is denoted as T in equation \ref{ivector}).  The speaker- and channel-dependent GMM mean supervector $\mu$ is modeled as:  
+\begin{equation}
+\mu = m + Tw
+\label{ivector}
+\end{equation}
 
-\section{Page layout and style}
-All papers must be submitted in compliance with the template as outlined.
-Please select the appropriate template from the author kit to develop your paper.
-Check details of your final PDF submission against the corresponding example file.
+Here, $m$ is the speaker- and channel-independent mean supervector. The i-vector is represented as $w$.
 
+Bahari et al. used a 60 dimensional feature vector consisting of 20 MFCCs appended by their derivatives to train the GMM system, and used a variation of $\mu$ and $m$ to obtain the i-vector. They showed that the age is best estimated without any dimension reduction on the i-vector, and the mean absolute error (MAE) in years for male and female speakers' age is 7.63 and 7.61, respectively.
+
+Garera and Yarowsky discusses several techniques to classify gender, age, etc using text only \cite{garera}. They used unigrams and bigrams with top tf-idf scores and stopwords as the features, and a linear SVM classifier for training and testing. For gender/age detection, they found the partner of a conversation has strong influence on the choice of words on both sides. Thus, they classify both partners jointly, e.g., male-male vs rest or female-female vs rest, and achieved better accuracy than classifying each partner separately. In addition, they found sociolinguistic features such as speaker rate and pronoun usage are good indicators of gender, etc.
+
+Boulis and Ostendorf analyzed the differences in word use between genders using phone conversation transcripts \cite{boulis}. To obtain the best classification accuracy of conversation sides according to the genders, they used the top 70\% of all bigrams in the corpus as features, sorted by the KL distance, the tf-idf as the feature scores and SVM as the classifier. This achieved an accuracy of around 93\%. However, using only 3\% of the top bigrams can still achieve around 90\% accuracy. Further, they found the conversation partners influence each other's linguistic patterns; hence, it is easier to classify same-gender conversations than cross-gender. 
+
+\section{Methods}
 
 \subsection{Basic layout features}
 \begin{itemize}
@@ -232,14 +236,21 @@ The InterSpeech 2012 organizing committee would like to thank the organizing com
 \eightpt
 \bibliographystyle{IEEEtran}
 \begin{thebibliography}{10}
-\bibitem[1]{ES1} Smith, J. O. and Abel, J. S., 
-``Bark and {ERB} Bilinear Transforms'', 
-IEEE Trans. Speech and Audio Proc., 7(6):697--708, 1999.  
-\bibitem[2]{ES2} Soquet, A., Saerens, M. and Jospa, P.,``Acoustic-articulatory
-inversion'', in T. Kohonen [Ed], Artificial Neural Networks, 371-376,
-Elsevier, 1991.
-\bibitem[3]{ES3} Stone, H.S., "On the uniqueness of the convolution theorem
-for the Fourier transform", NEC Labs. Amer. Princeton, NJ. 
-Online: http://citeseer.ist.psu.edu/176038.html, accessed on 19 Mar 2008.
+\bibitem[1]{bahari} Bahari, M. H., et al., 
+``Age Estimation from Telephone Speech using i-vectors'', 
+Interspeech, 2012.
+
+\bibitem[2]{dehak} Dehak, N., et al., 
+``Front-End Factor Analysis for Speaker Verification'', 
+IEEE Trans. Audio, Speech and Language Processing, 2011.
+
+\bibitem[3]{garera} Garera, N. and Yarowsky D.,
+``Modeling Latent Biographic Attributes in Conversational Genres'',
+ACL/IJCNLP, 2009
+
+\bibitem[4]{boulis} Boulis, B and Ostendorf, M.,
+``A Quantitative Analysis of Lexical Differences Between Genders in Telephone Conversations'',
+ACL, 2005
+
 \end{thebibliography}
 \end{document}
