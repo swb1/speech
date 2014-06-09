@@ -41,7 +41,7 @@
 
 
 \begin{abstract}
-In this report, we investigate various methods to estimate a speaker's background information using their phone conversations and the corresponding transcripts. Among other results, we achieved 98\% estimation accuracy in gender, and 68\% in education level using speech data alone. This report also includes the most discriminative words for gender derived from the KL distance, and a simulation of a speech recognition system to show the robustness of our methods using the ``transcribed'' text.
+In this report, we investigate various methods of estimating a speaker's background information using their phone conversations and the corresponding transcripts. Among other results, we achieved 98\% estimation accuracy in gender, and 68\% in education level using speech data alone. This report also includes the most discriminative words for gender derived from the KL distance, and a simulation of a speech recognition system to show the robustness of our methods using the ``transcribed'' text.
 \end{abstract}
 
 
@@ -49,7 +49,7 @@ In this report, we investigate various methods to estimate a speaker's backgroun
 Being able to automatically identify a speaker's background information in a phone conversation can have many benefits. For example, when a human interacts with a conversational agent, knowing the person's age can help machines customize their responses. Other usages may include targeted advertising and criminal investigation. In this report, we estimate a speaker's age, gender, education level and American English accent using their speech and transcripts in phone conversations.
 
 \section{Related Work}
-Bahari et al. extracted speech patterns based on i-vectors \cite{dehak}, then apply Support Vector Regression (SVR) to estimate the age of speakers \cite{bahari}. An i-vector or identity vector is a low-dimensional representation of a speaker obtained by projecting the speaker utterance onto the total variability space, which contains both speaker and channel variabilities (the basis is denoted as T in equation \ref{ivector}). Denote the speaker- and channel-dependent GMM mean supervector as $\mu$, and the speaker- and channel-independent mean supervector as $m$. The i-vector $w$ is modeled as:  
+Bahari et al. extracted speech patterns based on i-vectors \cite{dehak}, then applied Support Vector Regression (SVR) to estimate the age of speakers \cite{bahari}. An i-vector or identity vector is a low-dimensional representation of a speaker obtained by projecting the speaker utterance onto the total variability space, which contains both speaker and channel variabilities (the basis is denoted as T in equation \ref{ivector}). Denote the speaker- and channel-dependent GMM mean supervector as $\mu$, and the speaker- and channel-independent mean supervector as $m$. The i-vector $w$ is modeled as:  
 \begin{equation}
 \mu = m + Tw
 \label{ivector}
@@ -192,7 +192,24 @@ We discovered that openSMILE is the best audio feature among the three. The resu
 
 \subsection{Text}
 \subsubsection{Features}
+
 \subsubsection{Classifiers}
+
+\begin{table} [t,h]
+\caption{\label{feats_speech} {\it Test Accuracy for Different Classifiers (highest scores are in bold)}}
+\vspace{2mm}
+\centerline{
+\begin{tabular}{|c|c|}
+\hline
+\multirow{2}{*}{Classifiers} & Test Accuracy (\%) \\
+& accent/age/gender/edu \\ \hline \hline 
+k-NN & 25.49 / 31.43 / 71.13 / 61.82 \\
+Random Forest  & 32.25 / 39.7 / 79.39 / 66.47 \\
+SVC & 33.18 / \textbf{37.7} / \textbf{83} / \textbf{68.3} \\
+\hline
+\end{tabular}}
+\end{table}
+
 \subsubsection{Most Discriminative Words for Gender}
 If we drop the summation in Equation \ref{kl} and sort the scores for each class $c$, we get the most discriminative words against $c$. Table \ref{genderdis} shows the top discriminative words for gender as an example.
 
