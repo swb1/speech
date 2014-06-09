@@ -87,29 +87,26 @@ We have tried three different types of features for audio, namely, openSMILE \ci
 \end{itemize}
 
 \subsubsection{Text}
-There are two criteria for textual feature selection, which are the augmented tf-idf score and KL distance. We select words with the highest scores as the features based on one of the two criteria.
-\begin{itemize}
-\item augmented tf-idf: this score is high when the word $w$ occurs many times in a small number of documents. Hence $w$ is highly discriminative in those documents. Denote $d$ as the document and $\mathcal{T}$ as the corpus. We calculate the augmented tf-idf score of a term $t$ for the corpus $\mathcal{T}$ as follows:
-\begin{equation}
-  tf\textnormal{-} idf(t)^1 =\sum_{d \in \mathcal{T}}\sum_{t \in d} (0.5 + \frac{tf_{t,d}}{\underset{s}{\max}\, tf_{s,d}}) \cdot idf_{t} 
-\label{tfidf}
-\end{equation}
-
-\item KL distance: this score is high when the word $w$ is most discriminative for class $c$. It is computed as follows: 
+We used KL distance to do the feature selection.
 \begin{equation}
   KL(w) = D[p(c|w)||p(c)] = \sum_{c=1}^{C}p(c|w)\cdot log\frac{p(c|w)}{p(c)}.
 \label{kl}
 \end{equation}
 
 Given the smaller dataset we have, we only kept the words that are observed at least 3 times for each class.
-\end{itemize}
 
-In addition, we have two different approaches for scoring the features in each document $d$, which are the tf-idf and ``tf-kl hybrid'' method.
+In addition, we have three different approaches for scoring the features in each document $d$, which use tf-idf, augmented tf-idf and ``tf-kl hybrid'' scores respectively.
 \begin{itemize}
-\item tf-idf: this is the normal tf-idf score for a document $d$.
+\item tf-idf: this score is high when the word $w$ occurs many times in a small number of documents. Hence $w$ is highly discriminative in those documents.
 \begin{equation}
-  tf\textnormal{-} idf(t)^2 =tf_{t,d} \cdot idf_{t} 
+  tf\textnormal{-} idf(t)^1 =tf_{t,d} \cdot idf_{t} 
 \label{tfidf1}
+\end{equation}
+
+\item augmented tf-idf:  we calculate the augmented tf-idf score of a term $t$ as follows:
+\begin{equation}
+  tf\textnormal{-} idf(t)^2 = (0.5 + \frac{tf_{t,d}}{\underset{s}{\max}\, tf_{s,d}}) \cdot idf_{t} 
+\label{tfidf}
 \end{equation}
 
 \item ``tf-kl hybrid'': we multiply the tf score of a term $t$ by its KL distance. Empirically, this method works better than tf-idf for this corpus.
@@ -149,8 +146,8 @@ age (reg.) & 9.09 yrs \\
 \subsection{Audio}
 Two sets of parallel experiments are run. One is to fix the features and vary the classifier, the other is vice versa.
 \subsubsection{Classifiers}
-We fix the features as openSMILE, and run four classifiers, with PCA whitening on the SVM classifier (scikit-learn). We varied different parameters for each classifiers. In particular, for SVM, the set of number of principle components is \{50, 100, 150, 200, 250, 300, 350\}, the gammas is \{0.001, 0.01, 0.1, 1, 10\} and the regularization constant Cs is \{0.001, 0.01, 0.1, 1, 10\}. 
-The test accuracies are as follows:
+We fix the features as openSMILE, and run four classifiers, with PCA whitening on the features for the SVM classifier. We varied different parameters for each classifiers. In particular, for SVM, the set of number of principle components we tried is \{50, 100, 150, 200, 250, 300, 350\}, the gammas is \{0.001, 0.01, 0.1, 1, 10\} and the regularization constant Cs is \{0.001, 0.01, 0.1, 1, 10\}. 
+The test accuracies are shown in Table \ref{class_speech}.
 
 \begin{table} [t,h]
 \caption{\label{class_speech} {\it Test Accuracy for Different Classifiers (highest scores are in bold)}}
@@ -171,7 +168,7 @@ SVC + PCA & \textbf{34.23} / \textbf{34.81} / 97.67 / \textbf{68.1} \\
 Table \ref{class_speech} shows SVC + PCA is superior on everything except for gender, where GMM is better. On age regression problem, we used SVR + PCA and achieved MAE of 8.22 years. We note all accuracies beat the baseline, and the best gender classification accuracy exceeds the baseline by 42.75\%.
 
 \subsubsection{Features}
-The above section shows SVM + PCA is mostly the best classifier, so we use it on different speech features. We use the same range for gammas and Cs, but change the range for the number of principle components to \{50, 200, 500, 750, 1000, 3000, 5000, 7500, 10000, 12000\} for the last two features. 
+The above section shows SVM + PCA is mostly the best classifier, so we use it on different speech features. The results are shown in Table \ref{feats_speech}. We use the same range for gammas and Cs, but change the range for the number of principle components to \{50, 200, 500, 750, 1000, 3000, 5000, 7500, 10000, 12000\} for the last two features. 
 
 \begin{table} [t,h]
 \caption{\label{feats_speech} {\it Test Accuracy for Different Features (highest scores are in bold)}}
@@ -211,7 +208,7 @@ SVC & 33.18 / \textbf{37.7} / \textbf{83} / \textbf{68.3} \\
 \end{table}
 
 \subsubsection{Most Discriminative Words for Gender}
-If we drop the summation in Equation \ref{kl} and sort the scores for each class $c$, we get the most discriminative words against $c$. Table \ref{genderdis} shows the top discriminative words for gender as an example.
+If we drop the summation in Equation \ref{kl} and sort its scores for a class $c$, we get the most discriminative words against $c$. Table \ref{genderdis} shows the top discriminative words for gender as an example.
 
 \begin{table} [t,h]
 \caption{\label{genderdis} {\it Most Discriminative Words for Gender}}
@@ -237,14 +234,16 @@ blade & babies \\
 
 
 \subsubsection{Speech Recognition System Simulation}
-In recent speech recognition systems, the word error rate (WER) for the Switchboard corpus roughly ranges from 10\% to 25\% using deep neural network \cite{maas}. We are interested in using the transcribed speech generated from such a system to make prediction on the speakers properties. To simulate a real world speech recognition system, we swap each word in the dataset with a random word in the training set corpus with probability equal to the WER. The set of WERs (\%) we are using is \{0, 10, 15, 20, 25\}.
+In recent speech recognition systems, the word error rate (WER) for the Switchboard corpus roughly ranges from 10\% to 25\% using deep neural network \cite{maas}. We are interested in using the transcribed speech generated from such a system to make prediction on the speakers properties. To simulate a real world speech recognition system, we swap each word in the dataset with a random word in the training set corpus with probability equal to the WER. The set of WERs (\%) we used is \{0, 10, 15, 20, 25\}.
 
 
-\subsection{Audio + Text}
+\subsection{Combining Audio and Text Results}
+For non-categorical variables, i.e., age and education level, we merge the predictions from audio and text by simply averaging them on the test set. Averaging makes sense in this case because the labels imply order for non-categorical variables. While this approach slightly improves the age classification accuracy, it doesn't improve or do worse on the education classification and age regression problems.
+
+We also considered various methods such as Platt scaling \cite{platt} and isotonic regression to merge the results for categorical variables, namely, gender and accent. However, we did not implement the solution as it seems neither approach will produce a consistent answer with the SVM predictions. 
 
 \section{Conclusions}
 
-\section{Acknowledgements}
 
 \eightpt
 \bibliographystyle{IEEEtran}
@@ -286,6 +285,10 @@ ICML Workshop on Deep Learning for Audio, Speech, and Language Processing, 2013
 
 \bibitem[10]{svmguide} Hsu, CW., Chang, CC. and Lin, CJ., 
 ``A Practical Guide to Support Vector Classification, Appendix C''.
+
+\bibitem[11]{platt} Platt, J.,
+``Probabilistic Outputs for Support Vector Machines and Comparisons to Regularized Likelihood Methods'',
+Advances in Large Margin Classifiers, 1999
 
 \end{thebibliography}
 \end{document}
