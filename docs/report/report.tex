@@ -260,11 +260,11 @@ blade & babies \\
 
 In recent speech recognition systems, the word error rate (WER) for the Switchboard corpus roughly ranges from 10\% to 25\% using deep neural networks \cite{maas}. Although our dataset provides us perfect hand-written transcripts of the speech files, we want to investigate how well our text classifier might hold up in a real-world situation, where you do not have the luxury of a perfect transcription. This is potentially very important, as it might be useful to automatically transcribe a user's speech in real-time, and use the generated transcription to help predict the speaker's background. 
 
-To simulate a real world speech recognition system, we swap each word in the dataset with a random word in the training set corpus with probability equal to the WER. The set of WERs (\%) we used is \{0, 10, 15, 20, 25\}.
+To simulate a real world speech recognition system, we swap each word in the dataset with a random word in the training set corpus with probability equal to the WER. The set of WERs (\%) we used is \{0, 10, 15, 20, 25\}. The resulting error bars are shown in Figure \ref{wer}.
 
 \begin{figure}[t]
 \centerline{\includegraphics[width=80mm]{figures/wer.jpg}}
-\caption{{\it Word Error Rate Simulation}}  
+\caption{{\it Real World Transcripts Simulation}}  
 \label{wer}
 \end{figure}
 
