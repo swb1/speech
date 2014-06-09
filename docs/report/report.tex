@@ -6,7 +6,7 @@
 \usepackage{amsmath}
 \usepackage{multirow}
 
-\title{Identifying Speakers' Personal Information in Phone Conversations}
+\title{Identifying Speakers' Personal Information from Phone Conversations}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% If multiple authors, uncomment and edit the lines shown below.       %%
@@ -41,7 +41,7 @@
 
 
 \begin{abstract}
-In this report, we try to estimate speakers' background information using their phone conversations and the corresponding transcripts. We investigate different features and classifiers for speech and text data. Among other results, we achieved 98\% estimation accuracy in gender using audio data alone. This report also includes the most discriminative words for gender derived from the KL distance, and a simulation of a speech recognition system to show the robustness of our methods using the ``transcribed'' text.
+In this report, we try to estimate speakers' background information using their phone conversations and the corresponding transcripts. We investigate different features and classifiers for speech and text data. Among other results, we achieved 98\% estimation accuracy in gender using audio data alone. This report also includes the most discriminative words for gender derived from the KL distance, and a simulation of real-world transcription error to show the robustness of our methods using the ``transcribed'' text.
 \end{abstract}
 
 
@@ -256,7 +256,7 @@ blade & babies \\
 
 
 
-\subsubsection{Speech Recognition System Simulation}
+\subsubsection{Speech Recognition System Transcription Simulation}
 
 In recent speech recognition systems, the word error rate (WER) for the Switchboard corpus roughly ranges from 10\% to 25\% using deep neural networks \cite{maas}. Although our dataset provides us perfect hand-written transcripts of the speech files, we want to investigate how well our text classifier might hold up in a real-world situation, where you do not have the luxury of a perfect transcription. This is potentially very important, as it might be useful to automatically transcribe a user's speech in real-time, and use the generated transcription to help predict the speaker's background. 
 
