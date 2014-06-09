@@ -3,6 +3,9 @@
 \sloppy	% better line breaks
 %\ninept	% optional
 
+\usepackage{amsmath}
+\usepackage{multirow}
+
 \title{Identifying Speakers' Personal Information in Phone Conversations}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -46,26 +49,24 @@ In this report, we investigate various methods to estimate a speaker's backgroun
 Being able to automatically identify a speaker's background information in a phone conversation can have many benefits. For example, when a human interacts with a conversational agent, knowing the person's age can help machines customize their responses. Other usages may include targeted advertising and criminal investigation. In this report, we estimate a speaker's age, gender, education level and American English accent using their speech and transcripts in phone conversations.
 
 \section{Related Work}
-Bahari et al. extracted speech patterns based on i-vectors \cite{dehak}, then apply Support Vector Regression (SVR) to estimate the age of speakers \cite{bahari}. An i-vector or identity vector is a low-dimensional representation of a speaker obtained by projecting the speaker utterance onto the total variability space, which contains both speaker and channel variability (the basis is denoted as T in equation \ref{ivector}).  The speaker- and channel-dependent GMM mean supervector $\mu$ is modeled as:  
+Bahari et al. extracted speech patterns based on i-vectors \cite{dehak}, then apply Support Vector Regression (SVR) to estimate the age of speakers \cite{bahari}. An i-vector or identity vector is a low-dimensional representation of a speaker obtained by projecting the speaker utterance onto the total variability space, which contains both speaker and channel variabilities (the basis is denoted as T in equation \ref{ivector}). Denote the speaker- and channel-dependent GMM mean supervector as $\mu$, and the speaker- and channel-independent mean supervector as $m$. The i-vector $w$ is modeled as:  
 \begin{equation}
 \mu = m + Tw
 \label{ivector}
 \end{equation}
 
-Here, $m$ is the speaker- and channel-independent mean supervector. The i-vector is represented as $w$.
+Bahari et al. used 60 dimensional feature vectors consisting of 20 MFCCs appended by the first and second order derivatives to train the GMM system, and used a variation of $\mu$ and $m$ to obtain the i-vector. They showed that the age is best estimated without any dimension reduction on the i-vector, and the mean absolute error (MAE) in years for male and female speakers' age is 7.63 and 7.61, respectively.
 
-Bahari et al. used a 60 dimensional feature vector consisting of 20 MFCCs appended by the first and second order derivatives to train the GMM system, and used a variation of $\mu$ and $m$ to obtain the i-vector. They showed that the age is best estimated without any dimension reduction on the i-vector, and the mean absolute error (MAE) in years for male and female speakers' age is 7.63 and 7.61, respectively.
+Garera and Yarowsky discussed several techniques to classify gender, age, etc using text only \cite{garera}. They used unigrams and bigrams with top tf-idf scores and stopwords as the features, and a linear SVM classifier for training and testing. For gender/age detection, they found the partner of a conversation has strong influence on the choice of words on both sides. Thus, they classify the partners jointly, e.g., male-male vs rest and female-female vs rest, etc, and achieved better accuracy than classifying each partner separately. In addition, they found sociolinguistic features such as speaker rate and pronoun usage are good indicators of gender, etc.
 
-Garera and Yarowsky discussed several techniques to classify gender, age, etc using text only \cite{garera}. They used unigrams and bigrams with top tf-idf scores and stopwords as the features, and a linear SVM classifier for training and testing. For gender/age detection, they found the partner of a conversation has strong influence on the choice of words on both sides. Thus, they classify both partners jointly, e.g., male-male vs rest or female-female vs rest, and achieved better accuracy than classifying each partner separately. In addition, they found sociolinguistic features such as speaker rate and pronoun usage are good indicators of gender, etc.
-
-Boulis and Ostendorf analyzed the differences in word use between genders using phone conversation transcripts \cite{boulis}. To obtain the best classification accuracy of conversation sides according to the genders, they used the top 70\% of all bigrams in the corpus as features, sorted by the KL distance, the tf-idf as the feature scores and SVM as the classifier. This achieved an accuracy of around 93\%. However, using only 3\% of the top bigrams can still achieve around 90\% accuracy. Further, they found the conversation partners influence each other's linguistic patterns; hence, it is easier to classify same-gender conversations than cross-gender. 
+Boulis and Ostendorf analyzed the differences in word use between genders using phone conversation transcripts \cite{boulis}. To obtain the best classification accuracy of conversation sides according to the genders, they used the top 70\% of all bigrams in the corpus as features, sorted by the KL distance, the tf-idf as the feature score and SVM as the classifier. This achieved an accuracy of around 93\%. However, using only 3\% of the top bigrams can still achieve around 90\% accuracy. Further, they found the conversation partners influence each other's linguistic patterns; hence, it is easier to classify same-gender conversations than cross-gender. 
 
 \section{Methods}
 
 \subsection{Datasets}
-We are using the Switchboard Phase 2 corpus which was recorded in 1991/2. There are 543 speakers and 2262 phone conversations, consisting of 243 hours of speaking time, and 2.9M spoken words. We want to separate out the two speakers in each conversation. For audio files, we used sox to extract the conversation side for each speaker, and concatenate all segments together. For text files, we extract and concatenate the utterences by speakers.
+We use the Switchboard Phase 2 corpus which was recorded in 1991/2. There are 543 speakers and 2262 phone conversations, consisting of 243 hours of speaking time, and 2.9M spoken words. We separate out the two speakers in each conversation. For audio files, we used \texttt{sox} to extract the conversation side for each speaker and then concatenate all segments together. For text files, we extract and concatenate the utterences by speakers.
 
-As for the speaker properties, there are 2 genders, 5 education levels, 10 American English accents and 6 age groups (grouped by decades). Their distributions are plotted in Figure \ref{dists}. For age, we also used regression to compute mean absolute error (MAE) using chronological age.
+As for the classes for speaker properties, there are 2 genders, 5 education levels, 10 American English accents and 6 age groups (grouped by decades). Their distributions are plotted in Figure \ref{dists}. For age, we also used regression on chronological age and compute mean absolute error (MAE) .
 
 \begin{figure}[t]
 \centerline{\includegraphics[width=80mm]{figure}}
@@ -75,29 +76,152 @@ As for the speaker properties, there are 2 genders, 5 education levels, 10 Ameri
 
 \subsection{Feature Selection}
 \subsubsection{Audio}
-We have tried three different types of features for audio, namely, openSMILE, MFCC and openSMILE+MFCC. We used the same feature for each property estimation.
+We have tried three different types of features for audio, namely, openSMILE \cite{eyben}, MFCC and openSMILE + MFCC. The goal is to find the features that can characterize a speaker's variability. We used the same feature for each property estimation.
 
 \begin{itemize}
-\item openSMILE \cite{eyben}: there are 384 features including the characteristics for the signal energy, MFCC and F0, etc. We think these are useful to identify gender and age, etc.
-\item MFCC: we used Kaldi to extract MFCC
-\item openSMILE+MFCC:
+\item openSMILE: there are 384 features including the characteristics for the signal energy, MFCC, zero-crossing rate, voice probability and F0. We found all five features useful, and we think these are instrumental to identify gender and age, etc.
+
+\item MFCC: we used Kaldi's \cite{povey} \texttt{compute-mfcc-feats} utility to extract the MFCCs. These are 13 dimensional vectors extracted every 10ms. We randomly sampled 1000 vectors without replacement, then concatenate all of them to form a 13,000 dimensional feature vector.
+
+\item openSMILE + MFCC: we concatenated the openSMILE and MFCC features together and form a 13,384 dimensional feature vector.
 \end{itemize}
 
 \subsubsection{Text}
+There are two criteria for textual feature selection, which are the augmented tf-idf score and KL distance. We select words with the highest scores as the features based on one of the two criteria.
+\begin{itemize}
+\item augmented tf-idf: this score is high when the word $w$ occurs many times in a small number of documents. Hence $w$ is highly discriminative in those documents. Denote $d$ as the document and $\mathcal{T}$ as the corpus. We calculate the augmented tf-idf score of a term $t$ for the corpus $\mathcal{T}$ as follows:
+\begin{equation}
+  tf\textnormal{-} idf(t)^1 =\sum_{d \in \mathcal{T}}\sum_{t \in d} (0.5 + \frac{tf_{t,d}}{\underset{s}{\max}\, tf_{s,d}}) \cdot idf_{t} 
+\label{tfidf}
+\end{equation}
 
-\subsection{Classifiers}
+\item KL distance: this score is high when the word $w$ is most discriminative for class $c$. It is computed as follows: 
+\begin{equation}
+  KL(w) = D[p(c|w)||p(c)] = \sum_{c=1}^{C}p(c|w)\cdot log\frac{p(c|w)}{p(c)}.
+\label{kl}
+\end{equation}
+
+Given the smaller dataset we have, we only kept the words that are observed at least 3 times for each class.
+\end{itemize}
+
+In addition, we have two different approaches for scoring the features in each document $d$, which are the tf-idf and ``tf-kl hybrid'' method.
+\begin{itemize}
+\item tf-idf: this is the normal tf-idf score for a document $d$.
+\begin{equation}
+  tf\textnormal{-} idf(t)^2 =tf_{t,d} \cdot idf_{t} 
+\label{tfidf1}
+\end{equation}
+
+\item ``tf-kl hybrid'': we multiply the tf score of a term $t$ by its KL distance. Empirically, this method works better than tf-idf for this corpus.
+\begin{equation}
+  tf\textnormal{-} kl(t) = tf_{t,d} \cdot KL(t).
+\label{tfkl}
+\end{equation}
+\end{itemize}
+
+
+\subsection{Classifiers and Dimension Reduction}
+We experimented with four different classifiers, which are k-NN, GMM, random forest and SVM. Two versions of classification packages are used, which are LIBLINEAR \cite{liblin} and LIBSVM \cite{libsvm}. For audio, we used the RBF kernel from LIBSVM. For text, we used the linear kernel from LIBLINEAR. The linear kernel is used for text because its feature vectors have relatively high dimensions, and nonlinear mapping doesn't improve the performance \cite{svmguide}. In addition, the linear kernel may run much faster. We also tried dimension reduction on the feature vectors using PCA whitening, and applied the new features to SVM.
 
 \section{Experiments}
 \subsection{Experimental Setup and Implementation Details}
+We used 64\%/16\%/20\% split for train/validation/test sets. For each experiment, we train our model using the training set, and test the model on the validation set. We then select the model that generates the highest accuracy on the validation set, and produce the test accuracy on the test set. For both audio and text experiments, the datasets for train/validation/test are identical.
+
+\subsection{Baselines}
+For the classification problems for the four properties, we choose the percentage of the majority of the class in each property as its baseline estimation accuracy. For the regression problem on chronological age, we use the average age in the training set as the predicted age, then calculate MAE on test set using this age. The baselines are in Table \ref{baseline}.
+
+\begin{table}
+\caption{\label{baseline} {\it Baselines}}
+\vspace{2mm}
+\centerline{
+\begin{tabular}{|c|c|}
+\hline
+Property & Accuracy \\ \hline \hline 
+accent & 29.47\% \\
+age (class.) & 33.52\% \\
+gender & 55.62\% \\
+education & 56.91\% \\
+age (reg.) & 9.09 yrs \\
+\hline
+\end{tabular}}
+\end{table}
+
 \subsection{Audio}
-\subsubsection{Features}
+Two sets of parallel experiments are run. One is to fix the features and vary the classifier, the other is vice versa.
 \subsubsection{Classifiers}
+We fix the features as openSMILE, and run four classifiers, with PCA whitening on the SVM classifier (scikit-learn). We varied different parameters for each classifiers. In particular, for SVM, the set of number of principle components is \{50, 100, 150, 200, 250, 300, 350\}, the gammas is \{0.001, 0.01, 0.1, 1, 10\} and the regularization constant Cs is \{0.001, 0.01, 0.1, 1, 10\}. 
+The test accuracies are as follows:
+
+\begin{table} [t,h]
+\caption{\label{class_speech} {\it Test Accuracy for Different Classifiers (highest scores are in bold)}}
+\vspace{2mm}
+\centerline{
+\begin{tabular}{|c|c|}
+\hline
+\multirow{2}{*}{Classifiers} & Test Accuracy (\%) \\
+& accent/age/gender/edu \\ \hline \hline 
+k-NN & 22.4 / 27.29 / 68.64 / 49.39 \\
+GMM & 19.96 / 28.11 / \textbf{98.37} / 39.61 \\
+Random Forest & 25.87 / 30.96 / 96.33 / 51.12 \\
+SVC + PCA & \textbf{34.23} / \textbf{34.81} / 97.67 / \textbf{68.1} \\
+\hline
+\end{tabular}}
+\end{table}
+
+Table \ref{class_speech} shows SVC + PCA is superior on everything except for gender, where GMM is better. On age regression problem, we used SVR + PCA and achieved MAE of 8.22 years. We note all accuracies beat the baseline, and the best gender classification accuracy exceeds the baseline by 42.75\%.
+
+\subsubsection{Features}
+The above section shows SVM + PCA is mostly the best classifier, so we use it on different speech features. We use the same range for gammas and Cs, but change the range for the number of principle components to \{50, 200, 500, 750, 1000, 3000, 5000, 7500, 10000, 12000\} for the last two features. 
+
+\begin{table} [t,h]
+\caption{\label{feats_speech} {\it Test Accuracy for Different Features (highest scores are in bold)}}
+\vspace{2mm}
+\centerline{
+\begin{tabular}{|c|c|}
+\hline
+\multirow{2}{*}{Features} & Test Accuracy (\%) \\
+& accent/age/gender/edu \\ \hline \hline 
+openSMILE & \textbf{34.23} / \textbf{34.81} / \textbf{97.67} / \textbf{68.1} \\
+MFCC & 31.46 / 29.96 / 90.28 / 56.41 \\
+openSMILE + MFCC & 29.94 / 24.92 / 56.65 / 55.31 \\
+\hline
+\end{tabular}}
+\end{table}
+
+We discovered that openSMILE is the best audio feature among the three. The results show using the raw MFCC features won't increase the prediction accuracy. We need to obtain sophisticated derivatives of MFCCs such as the i-vectors to improve the performance.   
 
 \subsection{Text}
 \subsubsection{Features}
 \subsubsection{Classifiers}
 \subsubsection{Most Discriminative Words for Gender}
+If we drop the summation in Equation \ref{kl} and sort the scores for each class $c$, we get the most discriminative words against $c$. Table \ref{genderdis} shows the top discriminative words for gender as an example.
+
+\begin{table} [t,h]
+\caption{\label{genderdis} {\it Most Discriminative Words for Gender}}
+\vspace{2mm}
+\centerline{
+\begin{tabular}{|c|c|}
+\hline
+Male & Female \\ \hline \hline
+wife's & husband's \\
+metric & husband \\
+constitution & sew \\
+units & bake \\
+mustang & dresses \\
+baltimore & lovely \\
+non & sewing \\
+essentially & singing \\
+economical & gorgeous \\
+blade & babies \\
+\hline
+\end{tabular}}
+\end{table}
+
+
+
 \subsubsection{Speech Recognition System Simulation}
+In recent speech recognition systems, the word error rate (WER) for the Switchboard corpus roughly ranges from 10\% to 25\% using deep neural network \cite{maas}. We are interested in using the transcribed speech generated from such a system to make prediction on the speakers properties. To simulate a real world speech recognition system, we swap each word in the dataset with a random word in the training set corpus with probability equal to the WER. The set of WERs (\%) we are using is \{0, 10, 15, 20, 25\}.
+
 
 \subsection{Audio + Text}
 
@@ -116,7 +240,7 @@ Interspeech, 2012.
 ``Front-End Factor Analysis for Speaker Verification'', 
 IEEE Trans. Audio, Speech and Language Processing, 2011.
 
-\bibitem[3]{garera} Garera, N. and Yarowsky D.,
+\bibitem[3]{garera} Garera, N. and Yarowsky, D.,
 ``Modeling Latent Biographic Attributes in Conversational Genres'',
 ACL/IJCNLP, 2009
 
@@ -124,12 +248,27 @@ ACL/IJCNLP, 2009
 ``A Quantitative Analysis of Lexical Differences Between Genders in Telephone Conversations'',
 ACL, 2005
 
-\bibitem[5]{eyben} Eyben F., Wöllmer. M. and Schuller, B.,
+\bibitem[5]{eyben} Eyben, F., Wöllmer, M. and Schuller, B.,
 ``openSMILE – The Munich Versatile and Fast Open-Source Audio Feature Extractor'',
 ACM Multimedia, 2010
 
-\bibitem[6]{povey} Povey D., et al.,
+\bibitem[6]{povey} Povey, D., et al.,
 ``The Kaldi Speech Recognition Toolkit''.
+
+\bibitem[7]{liblin} Fan, RE., et al.,
+``LIBLINEAR: A Library for Large Linear Classification'',
+JMLR, 2008
+
+\bibitem[8]{libsvm} Chang, CC., et al.,
+``LIBSVM: A Library for Support Vector Machines'',
+ACM TIST, 2011
+
+\bibitem[9]{maas} Maas, A.,  Hannun, A. and Yg, A.,
+``Rectifier Nonlinearities Improve Neural Network Acoustic Models'',
+ICML Workshop on Deep Learning for Audio, Speech, and Language Processing, 2013
+
+\bibitem[10]{svmguide} Hsu, CW., Chang, CC. and Lin, CJ., 
+``A Practical Guide to Support Vector Classification, Appendix C''.
 
 \end{thebibliography}
 \end{document}
