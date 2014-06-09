@@ -262,6 +262,12 @@ In recent speech recognition systems, the word error rate (WER) for the Switchbo
 
 To simulate a real world speech recognition system, we swap each word in the dataset with a random word in the training set corpus with probability equal to the WER. The set of WERs (\%) we used is \{0, 10, 15, 20, 25\}.
 
+\begin{figure}[t]
+\centerline{\includegraphics[width=80mm]{figures/wer.jpg}}
+\caption{{\it Word Error Rate Simulation}}  
+\label{wer}
+\end{figure}
+
 \subsection{Combining Audio and Text Results}
 For non-categorical variables, i.e., age and education level, we merge the predictions from audio and text by simply averaging them on the test set. Averaging makes sense in this case because the labels imply order for non-categorical variables. While this approach slightly improves the age classification accuracy, it doesn't improve or do worse on the education classification and age regression problems.
 
