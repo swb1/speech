@@ -103,7 +103,7 @@ In addition, we have three different approaches for scoring the features in each
 \label{tfidf1}
 \end{equation}
 
-\item augmented tf-idf:  we calculate the augmented tf-idf score of a term $t$ as follows:
+\item augmented tf-idf:  this incorporates the relative frequency of this word inside it's document, helping prevent very large documents from skewing the dataset. We calculate the augmented tf-idf score of a term $t$ as follows:
 \begin{equation}
   tf\textnormal{-} idf(t)^2 = (0.5 + \frac{tf_{t,d}}{\underset{s}{\max}\, tf_{s,d}}) \cdot idf_{t} 
 \label{tfidf}
