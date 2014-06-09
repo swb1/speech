@@ -149,7 +149,7 @@ age (reg.) & 9.09 yrs \\
 \subsection{Audio}
 Two sets of parallel experiments are run. One is to fix the features and vary the classifier, the other is vice versa.
 \subsubsection{Classifiers}
-We fix the features as openSMILE, and run four classifiers, with PCA whitening on the SVM classifier. We varied different parameters for each classifiers. In particular, for SVM, the set of number of principle components is \{50, 100, 150, 200, 250, 300, 350\}, the gammas is \{0.001, 0.01, 0.1, 1, 10\} and the regularization constant Cs is \{0.001, 0.01, 0.1, 1, 10\}. 
+We fix the features as openSMILE, and run four classifiers, with PCA whitening on the features for the SVM classifier. We varied different parameters for each classifiers. In particular, for SVM, the set of number of principle components we tried is \{50, 100, 150, 200, 250, 300, 350\}, the gammas is \{0.001, 0.01, 0.1, 1, 10\} and the regularization constant Cs is \{0.001, 0.01, 0.1, 1, 10\}. 
 The test accuracies are shown in Table \ref{class_speech}.
 
 \begin{table} [t,h]
@@ -194,7 +194,7 @@ We discovered that openSMILE is the best audio feature among the three. The resu
 \subsubsection{Features}
 \subsubsection{Classifiers}
 \subsubsection{Most Discriminative Words for Gender}
-If we drop the summation in Equation \ref{kl} and sort its scores for each class $c$, we get the most discriminative words against $c$. Table \ref{genderdis} shows the top discriminative words for gender as an example.
+If we drop the summation in Equation \ref{kl} and sort its scores for a class $c$, we get the most discriminative words against $c$. Table \ref{genderdis} shows the top discriminative words for gender as an example.
 
 \begin{table} [t,h]
 \caption{\label{genderdis} {\it Most Discriminative Words for Gender}}
@@ -220,13 +220,13 @@ blade & babies \\
 
 
 \subsubsection{Speech Recognition System Simulation}
-In recent speech recognition systems, the word error rate (WER) for the Switchboard corpus roughly ranges from 10\% to 25\% using deep neural network \cite{maas}. We are interested in using the transcribed speech generated from such a system to make prediction on the speakers properties. To simulate a real world speech recognition system, we swap each word in the dataset with a random word in the training set corpus with probability equal to the WER. The set of WERs (\%) we are using is \{0, 10, 15, 20, 25\}.
+In recent speech recognition systems, the word error rate (WER) for the Switchboard corpus roughly ranges from 10\% to 25\% using deep neural network \cite{maas}. We are interested in using the transcribed speech generated from such a system to make prediction on the speakers properties. To simulate a real world speech recognition system, we swap each word in the dataset with a random word in the training set corpus with probability equal to the WER. The set of WERs (\%) we used is \{0, 10, 15, 20, 25\}.
 
 
-\subsection{Audio + Text}
-For non-categorical variables, i.e., age and education level, we merge the results from audio and text by simply averaging the predictions from both sources on the test set. Averaging makes sense in this case because the labels imply order for non-categorical variables. While this approach slightly improves the age classification accuracy, it doesn't improve or do worse on the education classification and age regression problems.
+\subsection{Combining Audio and Text Results}
+For non-categorical variables, i.e., age and education level, we merge the predictions from audio and text by simply averaging them on the test set. Averaging makes sense in this case because the labels imply order for non-categorical variables. While this approach slightly improves the age classification accuracy, it doesn't improve or do worse on the education classification and age regression problems.
 
-We also considered various methods such as Platt scaling \cite{platt} and isotonic regression to merge the results for categorical variables, namely, gender and accent. However, we did not implement the solution as it seems neither approach will produce a consistent answer with our SVM predictions. 
+We also considered various methods such as Platt scaling \cite{platt} and isotonic regression to merge the results for categorical variables, namely, gender and accent. However, we did not implement the solution as it seems neither approach will produce a consistent answer with the SVM predictions. 
 
 \section{Conclusions}
 
