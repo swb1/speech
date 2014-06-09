@@ -87,29 +87,26 @@ We have tried three different types of features for audio, namely, openSMILE \ci
 \end{itemize}
 
 \subsubsection{Text}
-There are two criteria for textual feature selection, which are the augmented tf-idf score and KL distance. We select words with the highest scores as the features based on one of the two criteria.
-\begin{itemize}
-\item augmented tf-idf: this score is high when the word $w$ occurs many times in a small number of documents. Hence $w$ is highly discriminative in those documents. Denote $d$ as the document and $\mathcal{T}$ as the corpus. We calculate the augmented tf-idf score of a term $t$ for the corpus $\mathcal{T}$ as follows:
-\begin{equation}
-  tf\textnormal{-} idf(t)^1 =\sum_{d \in \mathcal{T}}\sum_{t \in d} (0.5 + \frac{tf_{t,d}}{\underset{s}{\max}\, tf_{s,d}}) \cdot idf_{t} 
-\label{tfidf}
-\end{equation}
-
-\item KL distance: this score is high when the word $w$ is most discriminative for class $c$. It is computed as follows: 
+We used KL distance to do the feature selection.
 \begin{equation}
   KL(w) = D[p(c|w)||p(c)] = \sum_{c=1}^{C}p(c|w)\cdot log\frac{p(c|w)}{p(c)}.
 \label{kl}
 \end{equation}
 
 Given the smaller dataset we have, we only kept the words that are observed at least 3 times for each class.
-\end{itemize}
 
-In addition, we have two different approaches for scoring the features in each document $d$, which are the tf-idf and ``tf-kl hybrid'' method.
+In addition, we have three different approaches for scoring the features in each document $d$, which use tf-idf, augmented tf-idf and ``tf-kl hybrid'' scores respectively.
 \begin{itemize}
-\item tf-idf: this is the normal tf-idf score for a document $d$.
+\item tf-idf: this score is high when the word $w$ occurs many times in a small number of documents. Hence $w$ is highly discriminative in those documents.
 \begin{equation}
-  tf\textnormal{-} idf(t)^2 =tf_{t,d} \cdot idf_{t} 
+  tf\textnormal{-} idf(t)^1 =tf_{t,d} \cdot idf_{t} 
 \label{tfidf1}
+\end{equation}
+
+\item augmented tf-idf:  we calculate the augmented tf-idf score of a term $t$ as follows:
+\begin{equation}
+  tf\textnormal{-} idf(t)^2 = (0.5 + \frac{tf_{t,d}}{\underset{s}{\max}\, tf_{s,d}}) \cdot idf_{t} 
+\label{tfidf}
 \end{equation}
 
 \item ``tf-kl hybrid'': we multiply the tf score of a term $t$ by its KL distance. Empirically, this method works better than tf-idf for this corpus.
