@@ -41,7 +41,7 @@
 
 
 \begin{abstract}
-In this report, we investigate various methods of estimating a speaker's background information using their phone conversations and the corresponding transcripts. Among other results, we achieved 98\% estimation accuracy in gender, and 68\% in education level using speech data alone. This report also includes the most discriminative words for gender derived from the KL distance, and a simulation of a speech recognition system to show the robustness of our methods using the ``transcribed'' text.
+In this report, we try to estimate speakers' background information using their phone conversations and the corresponding transcripts. We investigate different features and classifiers for speech and text data. Among other results, we achieved 98\% estimation accuracy in gender using audio data alone. This report also includes the most discriminative words for gender derived from the KL distance, and a simulation of a speech recognition system to show the robustness of our methods using the ``transcribed'' text.
 \end{abstract}
 
 
@@ -69,8 +69,8 @@ We use the Switchboard Phase 2 corpus which was recorded in 1991/2. There are 54
 As for the classes for speaker properties, there are 2 genders, 5 education levels, 10 American English accents and 6 age groups (grouped by decades). Their distributions are plotted in Figure \ref{dists}. For age, we also used regression on chronological age and compute mean absolute error (MAE) .
 
 \begin{figure}[t]
-\centerline{\includegraphics[width=80mm]{figure}}
-\caption{{\it Speaker property distributions}}  
+\centerline{\includegraphics[width=80mm]{figures/priors.png}}
+\caption{{\it Speaker Property Distributions}}  
 \label{dists}
 \end{figure}
 
@@ -156,7 +156,7 @@ The test accuracies are shown in Table \ref{class_speech}.
 \centerline{
 \begin{tabular}{|c|c|}
 \hline
-\multirow{2}{*}{Classifiers} & Test Accuracy (\%) \\
+\multirow{2}{*}{Classifier} & Test Accuracy (\%) \\
 & accent/age/gender/edu \\ \hline \hline 
 k-NN & 22.4 / 27.29 / 68.64 / 49.39 \\
 GMM & 19.96 / 28.11 / \textbf{98.37} / 39.61 \\
@@ -177,7 +177,7 @@ The above section shows SVM + PCA is mostly the best classifier, so we use it on
 \centerline{
 \begin{tabular}{|c|c|}
 \hline
-\multirow{2}{*}{Features} & Test Accuracy (\%) \\
+\multirow{2}{*}{Feature} & Test Accuracy (\%) \\
 & accent/age/gender/edu \\ \hline \hline 
 openSMILE & \textbf{34.23} / \textbf{34.81} / \textbf{97.67} / \textbf{68.1} \\
 MFCC & 31.46 / 29.96 / 90.28 / 56.41 \\
@@ -199,7 +199,7 @@ We used KL divergence as the feature selection criterion, and ``tf-kl hybrid'' a
 \centerline{
 \begin{tabular}{|c|c|}
 \hline
-\multirow{2}{*}{Classifiers} & Test Accuracy (\%) \\
+\multirow{2}{*}{Classifier} & Test Accuracy (\%) \\
 & accent/age/gender/edu \\ \hline \hline 
 k-NN & 25.49 / 31.43 / 71.13 / 61.82 \\
 random forest  & 32.25 / \textbf{39.7} / 79.39 / 66.47 \\
@@ -213,18 +213,19 @@ Table \ref{class_text} shows SVM is still mostly the best classifier among all t
 To compare with the best accuracy using the speech data shown in Table \ref{class_speech}, we can see the text features are marginally better on education level prediction; while the speech features are much better on gender, and slightly better on accent. For age, we could not decide which feature is better as the classification and regression results are different.
 
 \subsubsection{Features}
+Again, KL divergence is used as the feature selection criterion, and we tried all classifiers and used the same set for the regularization constants as in the previous section. As shown in Table \ref{feats_text}, despite the popularity of tf-idf and its variants, our ``tf-kl hybrid'' method achieves higher prediction accuracies on all four properties.
 
 \begin{table} [t,h]
-\caption{\label{class_text} {\it Test Accuracy for Different Feature Scoring Methods (highest scores are in bold)}}
+\caption{\label{feats_text} {\it Test Accuracy for Different Feature Scoring Functions (highest scores are in bold)}}
 \vspace{2mm}
 \centerline{
 \begin{tabular}{|c|c|}
 \hline
-\multirow{2}{*}{Scoring Method} & Test Accuracy (\%) \\
+\multirow{2}{*}{Scoring Function} & Test Accuracy (\%) \\
 & accent/age/gender/edu \\ \hline \hline 
 tf-idf &   30.85/ 33.99/ 69.97/ 63.91 \\
 augmented tf-idf  & 30.85 / 33.99 / 71.36 / 66.82 \\
-tf-kl hybrid & \textbf{33.18} / \textbf{37.7} / \textbf{83} / \textbf{68.3} \\
+``tf-kl hybrid'' & \textbf{33.18} / \textbf{37.7} / \textbf{83} / \textbf{68.3} \\
 \hline
 \end{tabular}}
 \end{table}
@@ -265,7 +266,7 @@ For non-categorical variables, i.e., age and education level, we merge the predi
 We also considered various methods such as Platt scaling \cite{platt} and isotonic regression to merge the results for categorical variables, namely, gender and accent. However, we did not implement the solution as it seems neither approach will produce a consistent answer with the SVM predictions. 
 
 \section{Conclusions}
-
+In this report, we studied some state-of-the-art feature selection and classification algorithms to classify speakers' background information, including age, accent, gender and education level. We applied some of the methods learned from the papers, and some of our own methods to the Switchboard Phase 2 corpus. We found that speech and text data have roughly the same effects in determining age, accent and education level; while speech data is superior in gender detection. Further, combining the two sources by averaging the results on some properties can slightly improve the accuracy. Lastly, we discovered that using a transcription with up to 25\% WER, the textual classification algorithm can still be robust on making predictions on the background information as when the WER is lower. 
 
 \eightpt
 \bibliographystyle{IEEEtran}
