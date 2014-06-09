@@ -128,7 +128,7 @@ We experimented with four different classifiers, which are k-NN, GMM, random for
 We used 64\%/16\%/20\% split for train/validation/test sets. For each experiment, we train our model using the training set, and test the model on the validation set. We then select the model that generates the highest accuracy on the validation set, and produce the test accuracy on the test set. For both audio and text experiments, the datasets for train/validation/test are identical.
 
 \subsection{Baselines}
-For the classification problems for the four properties, we choose the percentage of the majority of the class in each property as its baseline estimation accuracy. For the regression problem on chronological age, we use the average age in the training set as the predicted age, then calculate MAE on test set using this age. The baselines are in Table \ref{baseline}.
+For the classification problems for the four properties, we choose the percentage of the majority class in each property as its baseline estimation accuracy. For the regression problem on chronological age, we use the average age in the training set as the predicted age, then calculate MAE on test set using this age. The baselines are in Table \ref{baseline}.
 
 \begin{table}
 \caption{\label{baseline} {\it Baselines}}
