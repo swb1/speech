@@ -66,7 +66,7 @@ Boulis and Ostendorf analyzed the differences in word use between genders using 
 \subsection{Datasets}
 We use the Switchboard Phase 2 corpus which was recorded in 1991/2. There are 543 speakers and 2262 phone conversations, consisting of 243 hours of speaking time, and 2.9M spoken words. We separate out the two speakers in each conversation. For audio files, we used \texttt{sox} to extract the conversation side for each speaker and then concatenate all segments together. For text files, we extract and concatenate the utterences by speakers.
 
-As for the classes for speaker properties, there are 2 genders, 5 education levels, 10 American English accents and 6 age groups (grouped by decades). Their distributions are plotted in Figure \ref{dists}. For age, we also used regression on chronological age and compute mean absolute error (MAE) .
+As for the classes for speaker properties, there are 2 genders, 5 education levels, 10 American English accents and 6 age groups (grouped by decades). Their distributions are plotted in Figure \ref{dists}. For age, we also used regression on chronological age and computed mean absolute error (MAE) .
 
 \begin{figure}[t]
 \centerline{\includegraphics[width=80mm]{figures/priors.png}}
@@ -76,18 +76,18 @@ As for the classes for speaker properties, there are 2 genders, 5 education leve
 
 \subsection{Feature Selection}
 \subsubsection{Audio Features}
-We have tried three different types of features for audio, namely, openSMILE \cite{eyben}, MFCC and openSMILE + MFCC. The goal is to find the features that can characterize a speaker's variability. We used the same feature for each property estimation.
+We have tried three different types of features for audio, namely, openSMILE \cite{eyben}, MFCC and openSMILE + MFCC. The goal is to find the features that can characterize a speaker's variability. We used the same features for each property estimation.
 
 \begin{itemize}
 \item openSMILE: there are 384 features including the characteristics for the signal energy, MFCC, zero-crossing rate, voice probability and F0. We found all five features useful, and we think these are instrumental to identify gender and age, etc.
 
-\item MFCC: we used Kaldi's \cite{povey} \texttt{compute-mfcc-feats} utility to extract the MFCCs. These are 13 dimensional vectors extracted every 10ms. We randomly sampled 1000 vectors without replacement, then concatenate all of them to form a 13,000 dimensional feature vector.
+\item MFCC: we used Kaldi's \cite{povey} \texttt{compute-mfcc-feats} utility to extract the MFCCs. These are 13 dimensional vectors extracted every 10ms. We randomly sampled 1000 vectors without replacement, then concatenated all of them to form a 13,000 dimensional feature vector.
 
-\item openSMILE + MFCC: we concatenated the openSMILE and MFCC features together and form a 13,384 dimensional feature vector.
+\item openSMILE + MFCC: we concatenated the openSMILE and MFCC features together and formed a 13,384 dimensional feature vector.
 \end{itemize}
 
 \subsubsection{Text Features}
-KL distance is used for feature selection. If the existence of a word $w$ can significantly increase the likelihood of being in class $c$, then $w$ is a discriminative feature. The KL distance of $w$ is computed as follows:
+KL distance is used for feature selection. If the existence of a word $w$ can significantly increase the likelihood of being in class $c$, then $w$ is a discriminative feature. KL distance measures the degree of descrimination of $w$, and is computed as follows:
 \begin{equation}
   KL(w) = D[p(c|w)||p(c)] = \sum_{c=1}^{C}p(c|w)\cdot log\frac{p(c|w)}{p(c)}.
 \label{kl}
@@ -147,7 +147,7 @@ age (reg.) & 9.09 yrs \\
 
 \subsection{Audio}
 \subsubsection{Classifiers}
-We fix the features as openSMILE, and run four classifiers, with PCA whitening on the features for the SVM classifier. We varied different parameters for each classifiers. In particular, for SVM, the set of number of principle components we tried is \{50, 100, 150, 200, 250, 300, 350\}, the gammas is \{0.001, 0.01, 0.1, 1, 10\} and the regularization constant Cs is \{0.005, 0.05, 0.5, 5, 50\}. 
+We fix the features as openSMILE, and run four classifiers, with PCA whitening on the features for the SVM classifier. We varied different parameters for each of the classifiers. In particular, for SVM, the set of principle component numbers we tried is \{50, 100, 150, 200, 250, 300, 350\}, the gammas are \{0.001, 0.01, 0.1, 1, 10\} and the regularization constants C are \{0.005, 0.05, 0.5, 5, 50\}. 
 The test accuracies are shown in Table \ref{class_speech}.
 
 \begin{table} [t,h]
@@ -166,7 +166,7 @@ SVC + PCA & \textbf{34.23} / \textbf{34.81} / 97.67 / \textbf{68.1} \\
 \end{tabular}}
 \end{table}
 
-Table \ref{class_speech} shows SVC + PCA is superior on everything except for gender, where GMM is better. On age regression problem, we used SVR + PCA and achieved MAE of 8.22 years. We note all accuracies beat the baseline, and the best gender classification accuracy exceeds the baseline by 42.75\%.
+Table \ref{class_speech} shows SVC + PCA is superior on everything except for gender, where GMM is better. On age regression problems, we used SVR + PCA and achieved an MAE of 8.22 years. We note all accuracies beat the baseline, and the best gender classification accuracy exceeds the baseline by 42.75\%.
 
 \subsubsection{Features}
 The above section shows SVM + PCA is mostly the best classifier, so we use it on different speech features. The results are shown in Table \ref{feats_speech}. We use the same range for gammas and Cs, but change the range for the number of principle components to \{50, 200, 500, 750, 1000, 3000, 5000, 7500, 10000, 12000\} for the last two features. 
@@ -274,7 +274,7 @@ For non-categorical variables, i.e., age and education level, we merge the predi
 We also considered various methods such as Platt scaling \cite{platt} and isotonic regression to merge the results for categorical variables, namely, gender and accent. However, we did not implement the solution as it seems neither approach will produce a consistent answer with the SVM predictions. 
 
 \section{Conclusions}
-In this report, we studied state-of-the-art feature selection and classification algorithms to classify speakers' background information, including age, accent, gender and education level. We applied some of the methods learned from the papers, and some of our own methods to the Switchboard Phase 2 corpus. We found that speech and text data have roughly the same effects in determining age, accent and education level; while speech data is superior in gender detection. Further, combining the two sources by averaging the results on some properties can slightly improve the accuracy. Lastly, we discovered that using a transcription with up to 25\% WER, the textual classification algorithm can still be robust in making predictions on the background information as when the WER is lower. Going forward, we hope to expand on this work by applying partner models and deep learning to improve our classifiers and build an even better and more reliable predictive system.
+In this report, we studied state-of-the-art feature selection and classification algorithms to classify speakers' background information, including age, accent, gender and education level. We applied some of the methods learned from the papers, and some of our own methods to the Switchboard Phase 2 corpus. We found that speech and text data have roughly the same effects in determining age, accent and education level; while speech data is superior in gender detection. Further, combining the two sources by averaging the results on some properties can slightly improve the accuracy. Lastly, we discovered that using a transcription with up to 25\% WER, the textual classification algorithm can still be robust in making predictions on the background information. Going forward, we hope to expand on this work by looking into partner models, and applying deep learning to improve our classifiers.
 
 \eightpt
 \bibliographystyle{IEEEtran}
