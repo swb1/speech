@@ -214,6 +214,21 @@ To compare with the best accuracy using the speech data shown in Table \ref{clas
 
 \subsubsection{Features}
 
+\begin{table} [t,h]
+\caption{\label{class_text} {\it Test Accuracy for Different Feature Scoring Methods (highest scores are in bold)}}
+\vspace{2mm}
+\centerline{
+\begin{tabular}{|c|c|}
+\hline
+\multirow{2}{*}{Classifiers} & Test Accuracy (\%) \\
+& accent/age/gender/edu \\ \hline \hline 
+tf-idf &   30.85/ 33.99/ 69.97/ 63.91 \\
+augmented tf-idf  & 30.85 / 33.99 / 71.36 / 66.82 \\
+tf-kl hybrid & \textbf{33.18} / \textbf{37.7} / \textbf{83} / \textbf{68.3} \\
+\hline
+\end{tabular}}
+\end{table}
+
 \subsubsection{Most Discriminative Words for Gender}
 If we drop the summation in Equation \ref{kl} and sort its scores for a class $c$, we get the most discriminative words against $c$. Table \ref{genderdis} shows the top discriminative words for gender as an example.
 
