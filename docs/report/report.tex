@@ -124,6 +124,8 @@ We experimented with four different classifiers, which are k-NN, GMM, random for
 \subsection{Experimental Setup and Implementation Details}
 We used 64\%/16\%/20\% split for train/validation/test sets. For each experiment, we train our model using the training set, and test the model on the validation set. We then select the model that generates the highest accuracy on the validation set, and produce the test accuracy on the test set. For both audio and text experiments, the datasets for train/validation/test are identical.
 
+Again, for both audio and text, two sets of experiments are run for each. One is to fix the features and vary the classifier, the other is vice versa.
+
 \subsection{Baselines}
 For the classification problems for the four properties, we choose the percentage of the majority class in each property as its baseline estimation accuracy. For the regression problem on chronological age, we use the average age in the training set as the predicted age, then calculate MAE on test set using this age. The baselines are in Table \ref{baseline}.
 
@@ -144,13 +146,12 @@ age (reg.) & 9.09 yrs \\
 \end{table}
 
 \subsection{Audio}
-Two sets of parallel experiments are run. One is to fix the features and vary the classifier, the other is vice versa.
 \subsubsection{Classifiers}
-We fix the features as openSMILE, and run four classifiers, with PCA whitening on the features for the SVM classifier. We varied different parameters for each classifiers. In particular, for SVM, the set of number of principle components we tried is \{50, 100, 150, 200, 250, 300, 350\}, the gammas is \{0.001, 0.01, 0.1, 1, 10\} and the regularization constant Cs is \{0.001, 0.01, 0.1, 1, 10\}. 
+We fix the features as openSMILE, and run four classifiers, with PCA whitening on the features for the SVM classifier. We varied different parameters for each classifiers. In particular, for SVM, the set of number of principle components we tried is \{50, 100, 150, 200, 250, 300, 350\}, the gammas is \{0.001, 0.01, 0.1, 1, 10\} and the regularization constant Cs is \{0.005, 0.05, 0.5, 5, 50\}. 
 The test accuracies are shown in Table \ref{class_speech}.
 
 \begin{table} [t,h]
-\caption{\label{class_speech} {\it Test Accuracy for Different Classifiers (highest scores are in bold)}}
+\caption{\label{class_speech} {\it Test Accuracy for Different Classifiers in Speech (highest scores are in bold)}}
 \vspace{2mm}
 \centerline{
 \begin{tabular}{|c|c|}
@@ -171,7 +172,7 @@ Table \ref{class_speech} shows SVC + PCA is superior on everything except for ge
 The above section shows SVM + PCA is mostly the best classifier, so we use it on different speech features. The results are shown in Table \ref{feats_speech}. We use the same range for gammas and Cs, but change the range for the number of principle components to \{50, 200, 500, 750, 1000, 3000, 5000, 7500, 10000, 12000\} for the last two features. 
 
 \begin{table} [t,h]
-\caption{\label{feats_speech} {\it Test Accuracy for Different Features (highest scores are in bold)}}
+\caption{\label{feats_speech} {\it Test Accuracy for Different Features in Speech (highest scores are in bold)}}
 \vspace{2mm}
 \centerline{
 \begin{tabular}{|c|c|}
@@ -188,12 +189,12 @@ openSMILE + MFCC & 29.94 / 24.92 / 56.65 / 55.31 \\
 We discovered that openSMILE is the best audio feature among the three. The results show using the raw MFCC features won't increase the prediction accuracy. We need to obtain sophisticated derivatives of MFCCs such as the i-vectors to improve the performance.   
 
 \subsection{Text}
-\subsubsection{Features}
 
 \subsubsection{Classifiers}
+We used KL divergence as the feature selection criterion, and ``tf-kl hybrid'' as the feature scoring function. We tried all 8 different classifiers provided by LIBLINEAR, and varied the regularization constant C in the set of \{0.01, 0.1, 1, 10\}. The results are shown in Table \ref{class_text}. We did not use GMM as we encountered the ``Out of memory'' problem. For SVC, we found that the best result is achieved without using PCA whitening. 
 
 \begin{table} [t,h]
-\caption{\label{feats_speech} {\it Test Accuracy for Different Classifiers (highest scores are in bold)}}
+\caption{\label{class_text} {\it Test Accuracy for Different Classifiers in Text (highest scores are in bold)}}
 \vspace{2mm}
 \centerline{
 \begin{tabular}{|c|c|}
@@ -201,11 +202,17 @@ We discovered that openSMILE is the best audio feature among the three. The resu
 \multirow{2}{*}{Classifiers} & Test Accuracy (\%) \\
 & accent/age/gender/edu \\ \hline \hline 
 k-NN & 25.49 / 31.43 / 71.13 / 61.82 \\
-Random Forest  & 32.25 / 39.7 / 79.39 / 66.47 \\
-SVC & 33.18 / \textbf{37.7} / \textbf{83} / \textbf{68.3} \\
+Random Forest  & 32.25 / \textbf{39.7} / 79.39 / 66.47 \\
+SVC & \textbf{33.18} / 37.7 / \textbf{83} / \textbf{68.3} \\
 \hline
 \end{tabular}}
 \end{table}
+
+Table \ref{class_text} shows SVM is still mostly the best classifier among all three. On age regression problem, SVR achieves a MAE of 8.68 years. 
+
+To compare with the best accuracy using the speech data shown in Table \ref{class_speech}, we can see the text features are marginally better on education level prediction; while the speech features are much better on gender, and slightly better on accent. For age, we could not decide which feature is better as the classification and regression results are different.
+
+\subsubsection{Features}
 
 \subsubsection{Most Discriminative Words for Gender}
 If we drop the summation in Equation \ref{kl} and sort its scores for a class $c$, we get the most discriminative words against $c$. Table \ref{genderdis} shows the top discriminative words for gender as an example.
