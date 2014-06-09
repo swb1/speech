@@ -103,7 +103,7 @@ In addition, we have three different approaches for scoring the features in each
 \label{tfidf1}
 \end{equation}
 
-\item augmented tf-idf:  we calculate the augmented tf-idf score of a term $t$ as follows:
+\item augmented tf-idf:  this incorporates the relative frequency of this word inside it's document, helping prevent very large documents from skewing the dataset. We calculate the augmented tf-idf score of a term $t$ as follows:
 \begin{equation}
   tf\textnormal{-} idf(t)^2 = (0.5 + \frac{tf_{t,d}}{\underset{s}{\max}\, tf_{s,d}}) \cdot idf_{t} 
 \label{tfidf}
@@ -274,7 +274,7 @@ For non-categorical variables, i.e., age and education level, we merge the predi
 We also considered various methods such as Platt scaling \cite{platt} and isotonic regression to merge the results for categorical variables, namely, gender and accent. However, we did not implement the solution as it seems neither approach will produce a consistent answer with the SVM predictions. 
 
 \section{Conclusions}
-In this report, we studied state-of-the-art feature selection and classification algorithms to classify speakers' background information, including age, accent, gender and education level. We applied some of the methods learned from the papers, and some of our own methods to the Switchboard Phase 2 corpus. We found that speech and text data have roughly the same effects in determining age, accent and education level; while speech data is superior in gender detection. Further, combining the two sources by averaging the results on some properties can slightly improve the accuracy. Lastly, we discovered that using a transcription with up to 25\% WER, the textual classification algorithm can still be robust on making predictions on the background information as when the WER is lower. 
+In this report, we studied state-of-the-art feature selection and classification algorithms to classify speakers' background information, including age, accent, gender and education level. We applied some of the methods learned from the papers, and some of our own methods to the Switchboard Phase 2 corpus. We found that speech and text data have roughly the same effects in determining age, accent and education level; while speech data is superior in gender detection. Further, combining the two sources by averaging the results on some properties can slightly improve the accuracy. Lastly, we discovered that using a transcription with up to 25\% WER, the textual classification algorithm can still be robust in making predictions on the background information as when the WER is lower. Going forward, we hope to expand on this work by applying partner models and deep learning to improve our classifiers and build an even better and more reliable predictive system.
 
 \eightpt
 \bibliographystyle{IEEEtran}
