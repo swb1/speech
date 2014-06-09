@@ -75,7 +75,7 @@ As for the classes for speaker properties, there are 2 genders, 5 education leve
 \end{figure}
 
 \subsection{Feature Selection}
-\subsubsection{Audio}
+\subsubsection{Audio Features}
 We have tried three different types of features for audio, namely, openSMILE \cite{eyben}, MFCC and openSMILE + MFCC. The goal is to find the features that can characterize a speaker's variability. We used the same feature for each property estimation.
 
 \begin{itemize}
@@ -86,14 +86,14 @@ We have tried three different types of features for audio, namely, openSMILE \ci
 \item openSMILE + MFCC: we concatenated the openSMILE and MFCC features together and form a 13,384 dimensional feature vector.
 \end{itemize}
 
-\subsubsection{Text}
-KL distance is used for feature selection. If the exitence of a word $w$ can significantly increase the likelihood of being in class $c$, then $w$ is a discriminative feature. The KL distance of $w$ is computed as follows:
+\subsubsection{Text Features}
+KL distance is used for feature selection. If the existence of a word $w$ can significantly increase the likelihood of being in class $c$, then $w$ is a discriminative feature. The KL distance of $w$ is computed as follows:
 \begin{equation}
   KL(w) = D[p(c|w)||p(c)] = \sum_{c=1}^{C}p(c|w)\cdot log\frac{p(c|w)}{p(c)}.
 \label{kl}
 \end{equation}
 
-We use the words with the highest KL distances as features. Given the smaller dataset we have, we only kept the words that are observed at least 3 times for each class.
+We use the words with the highest KL distances as features. Given the smaller dataset we have, we only kept the words that were observed at least 3 times for each class.
 
 In addition, we have three different approaches for scoring the features in each document $d$, which use tf-idf, augmented tf-idf and ``tf-kl hybrid'' scores respectively.
 \begin{itemize}
@@ -118,7 +118,7 @@ In addition, we have three different approaches for scoring the features in each
 
 
 \subsection{Classifiers and Dimension Reduction}
-We experimented with four different classifiers, which are k-NN, GMM, random forest and SVM. Two versions of classification packages are used, which are LIBLINEAR \cite{liblin} and LIBSVM \cite{libsvm}. For audio, we used the RBF kernel from LIBSVM. For text, we used the linear kernel from LIBLINEAR. The linear kernel is used for text because its feature vectors have relatively high dimensions, and nonlinear mapping doesn't improve the performance \cite{svmguide}. In addition, the linear kernel may run much faster. We also tried dimension reduction on the feature vectors using PCA whitening, and applied the new features to SVM.
+We experimented with four different classifiers, which are k-NN, GMM, random forest and SVM. Two versions of classification packages are used: LIBLINEAR \cite{liblin} and LIBSVM \cite{libsvm}. For audio, we used the RBF kernel from LIBSVM. For text, we used the linear kernel from LIBLINEAR. The linear kernel is used for text because its feature vectors have relatively high dimensions, and nonlinear mapping doesn't improve the performance \cite{svmguide}. In addition, the linear kernel may run much faster. We also tried dimension reduction on the feature vectors using PCA whitening, and applied the new features to SVM.
 
 \section{Experiments}
 \subsection{Experimental Setup and Implementation Details}
@@ -257,8 +257,10 @@ blade & babies \\
 
 
 \subsubsection{Speech Recognition System Simulation}
-In recent speech recognition systems, the word error rate (WER) for the Switchboard corpus roughly ranges from 10\% to 25\% using deep neural network \cite{maas}. We are interested in using the transcribed speech generated from such a system to make prediction on the speakers properties. To simulate a real world speech recognition system, we swap each word in the dataset with a random word in the training set corpus with probability equal to the WER. The set of WERs (\%) we used is \{0, 10, 15, 20, 25\}.
 
+In recent speech recognition systems, the word error rate (WER) for the Switchboard corpus roughly ranges from 10\% to 25\% using deep neural networks \cite{maas}. Although our dataset provides us perfect hand-written transcripts of the speech files, we want to investigate how well our text classifier might hold up in a real-world situation, where you do not have the luxury of a perfect transcription. This is potentially very important, as it might be useful to automatically transcribe a user's speech in real-time, and use the generated transcription to help predict the speaker's background. 
+
+To simulate a real world speech recognition system, we swap each word in the dataset with a random word in the training set corpus with probability equal to the WER. The set of WERs (\%) we used is \{0, 10, 15, 20, 25\}.
 
 \subsection{Combining Audio and Text Results}
 For non-categorical variables, i.e., age and education level, we merge the predictions from audio and text by simply averaging them on the test set. Averaging makes sense in this case because the labels imply order for non-categorical variables. While this approach slightly improves the age classification accuracy, it doesn't improve or do worse on the education classification and age regression problems.
@@ -266,7 +268,7 @@ For non-categorical variables, i.e., age and education level, we merge the predi
 We also considered various methods such as Platt scaling \cite{platt} and isotonic regression to merge the results for categorical variables, namely, gender and accent. However, we did not implement the solution as it seems neither approach will produce a consistent answer with the SVM predictions. 
 
 \section{Conclusions}
-In this report, we studied some state-of-the-art feature selection and classification algorithms to classify speakers' background information, including age, accent, gender and education level. We applied some of the methods learned from the papers, and some of our own methods to the Switchboard Phase 2 corpus. We found that speech and text data have roughly the same effects in determining age, accent and education level; while speech data is superior in gender detection. Further, combining the two sources by averaging the results on some properties can slightly improve the accuracy. Lastly, we discovered that using a transcription with up to 25\% WER, the textual classification algorithm can still be robust on making predictions on the background information as when the WER is lower. 
+In this report, we studied state-of-the-art feature selection and classification algorithms to classify speakers' background information, including age, accent, gender and education level. We applied some of the methods learned from the papers, and some of our own methods to the Switchboard Phase 2 corpus. We found that speech and text data have roughly the same effects in determining age, accent and education level; while speech data is superior in gender detection. Further, combining the two sources by averaging the results on some properties can slightly improve the accuracy. Lastly, we discovered that using a transcription with up to 25\% WER, the textual classification algorithm can still be robust on making predictions on the background information as when the WER is lower. 
 
 \eightpt
 \bibliographystyle{IEEEtran}
