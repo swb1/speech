@@ -87,13 +87,13 @@ We have tried three different types of features for audio, namely, openSMILE \ci
 \end{itemize}
 
 \subsubsection{Text}
-We used KL distance to do the feature selection.
+KL distance is used for feature selection. If the exitence of a word $w$ can significantly increase the likelihood of being in class $c$, then $w$ is a discriminative feature. The KL distance of $w$ is computed as follows:
 \begin{equation}
   KL(w) = D[p(c|w)||p(c)] = \sum_{c=1}^{C}p(c|w)\cdot log\frac{p(c|w)}{p(c)}.
 \label{kl}
 \end{equation}
 
-Given the smaller dataset we have, we only kept the words that are observed at least 3 times for each class.
+We use the words with the highest KL distances as features. Given the smaller dataset we have, we only kept the words that are observed at least 3 times for each class.
 
 In addition, we have three different approaches for scoring the features in each document $d$, which use tf-idf, augmented tf-idf and ``tf-kl hybrid'' scores respectively.
 \begin{itemize}
